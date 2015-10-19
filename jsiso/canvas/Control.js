@@ -1,24 +1,5 @@
-/*  
-Copyright (c) 2013 Iain Hamilton
+//18.10.15 развёртка экрана
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE. 
-*/
 
 define(function() {
 
@@ -50,8 +31,7 @@ define(function() {
     return dpr / bsr;
   }
 
- 
-  function _create(name, w, h, style, element, usePixelRatio) {
+   function _create(name, w, h, style, element, usePixelRatio) {
     var pxRatio = 1;
     var canvasType = null;
     if (_supported()) {
@@ -66,7 +46,6 @@ define(function() {
       for (var s in style) {
         canvasElement.style[s] = style[s];
       }
-      console.log(usePixelRatio);
       canvasType = '2d';
       canvasElement.style.width = w + "px";
       canvasElement.style.height = h + "px";
@@ -124,8 +103,13 @@ define(function() {
   * @param {Number} height
   */
   function _update(w, h) {
-    canvasElement.width = w || window.innerWidth;
-    canvasElement.height = h || window.innerHeight;
+    var pxRatio = 1;
+    canvasElement.width = (w + "px") || window.innerWidth;
+    canvasElement.height = (h + "px") || window.innerHeight;
+    canvasElement.style.width = window.innerWidth + "px";
+    canvasElement.style.height = window.innerHeight + "px";
+    canvasElement.width = w * pxRatio || window.innerWidth;
+    canvasElement.height = h * pxRatio || window.innerHeight;
   }
 
 
