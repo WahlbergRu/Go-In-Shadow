@@ -25,6 +25,14 @@
             color: #FFF;
             z-index: 400;
         }
+        .build{
+            position: fixed;
+            bottom: 20px;
+            background: #000;
+            height: 40px;
+            z-index: 1000;
+
+        }
         .gameInfo div{
             line-height: auto;
             background: #222244;
@@ -68,16 +76,20 @@
                     // ---------------------------------------
 
                     var gameScheme = {
-                        tileHeight: 50,
+                        tileHeight: 43,//30 градусов, отношение высоты к ширине
                         tileWidth: 100,
+
+                        map: 'mapSmall.json',
+                        imageFiles: 'imageFiles.json',
                     };
 
                     //TODO: сделать дравинг в зависимости от размера экрана
 
                     function launch() {
-                        jsonLoader(['map.json', 'imageFiles.json']).then(function(jsonResponse) {
+                        jsonLoader([gameScheme.map, gameScheme.imageFiles]).then(function(jsonResponse) {
                             imgLoader([{graphics: jsonResponse[1].images}]).then(function(imgResponse) {
-                                var game = new main(45, 45, 45, 45);  // X & Y drawing position, and tile span to draw
+                                var game = new main(0, 0, 20, 20);  // X & Y drawing position, and tile span to draw - малая карта
+                                // var game = new main(45, 45, 45, 45);// X & Y drawing position, and tile span to draw - большая карта
                                 game.init([{
                                     Title: "Graphics",
                                     layout: jsonResponse[0].ground,
@@ -107,7 +119,7 @@
                         var clickTile;
                         dictionary.forEach(function(tile, i) {
                             var clickTile = document.createElement("a");
-                            clickTile.innerHTML += ("<img  height='50' width='50' src='../img/sample1Img/"  + tile +"' />");
+                            clickTile.innerHTML += ("<img  height='50' width='50' src='../img/Grass/"  + tile +"' />");
                             document.getElementById("gameInfo").appendChild(clickTile);
                             clickTile.addEventListener("click", function(e){
                                 tileChoice(layer, (i + offset))
@@ -152,9 +164,11 @@
 
 
                         input.keyboard(function(keyCode, pressed, e) {
+                            //Светить в консоли кейкод
                             console.log(keyCode);
                             switch(keyCode) {
                                 case 65:
+                                    //a - отдалить
                                     mapLayers.map(function(layer) {
                                         if (startY + rangeY + 1 < mapLayers[0].getLayout().length) {
                                             layer.setZoom("out");
@@ -166,6 +180,7 @@
                                     });
                                     break;
                                 case 83:
+                                    //s - приблизить
                                     mapLayers.map(function(layer) {
                                         if (rangeY - 1 > defaultRangeY - 1) {
                                             layer.setZoom("in");
@@ -177,12 +192,14 @@
                                     });
                                     break;
                                 case 49:
+                                    // 1 - жми АДЫН
                                     mapLayers.map(function(layer) {
                                         layer.toggleGraphicsHide(true);
                                         layer.toggleHeightShadow(true);
                                     });
                                     break;
                                 case 50:
+                                    // 2 - жми два
                                     mapLayers.map(function(layer) {
                                         layer.toggleGraphicsHide(false);
                                         layer.toggleHeightShadow(false);
@@ -196,6 +213,7 @@
                                     }
                                     break;
                                 case 89:
+                                    //Поворот Y, U
                                     if (pressed) {
                                         mapLayers.map(function(layer) {
                                             layer.rotate("left");
@@ -203,6 +221,7 @@
                                     }
                                     break;
                                 case 85:
+                                    //Поворот Y, U
                                     if (pressed) {
                                         mapLayers.map(function(layer) {
                                             layer.rotate("right");
@@ -210,6 +229,8 @@
                                     }
                                     break;
                                 case 75:
+                                    //save на кнопку, пока что-почему-то не работает, но метод лучше оставить. Вдруг пригодится)))
+                                    //в нём чувствуется какая-то будущее нужда на ровне с вебсокетом
                                     var XML = new XMLPopulate();
                                     XML.saveMap(44, mapLayers[0].getLayout(), mapLayers[0].getHeightLayout(), null);
                                     break;
@@ -295,6 +316,13 @@
     </script>
 </head>
 <body>
-<div id="gameInfo" class="gameInfo"> <div>[Y][U] Rotate  <br>[B] Build - [Arrow] <br> direction </div></div>
+<div id="gameInfo" class="build">
+
+</div>
+<div class="gameInfo">
+    <div>[Y][U] Rotate
+    <br>[B] Build
+    <br>[Arrow] direction </div>
+</div>
 </body>
 </html>
