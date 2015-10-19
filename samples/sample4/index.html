@@ -77,7 +77,7 @@
                     function launch() {
                         jsonLoader(['map.json', 'imageFiles.json']).then(function(jsonResponse) {
                             imgLoader([{graphics: jsonResponse[1].images}]).then(function(imgResponse) {
-                                var game = new main(-25, -25, 50, 50);  // X & Y drawing position, and tile span to draw
+                                var game = new main(45, 45, 45, 45);  // X & Y drawing position, and tile span to draw
                                 game.init([{
                                     Title: "Graphics",
                                     layout: jsonResponse[0].ground,
@@ -224,9 +224,9 @@
                                             layer.move('down', gameScheme.tileHeight);
                                             layer.move('left', gameScheme.tileHeight);
                                         });
+                                        startX --;
+                                        startY ++;
                                     }
-                                    startX --;
-                                    startY ++;
                                     break;
                                 case 38:
                                     if (pressed) {
@@ -234,9 +234,9 @@
                                             layer.move('down', gameScheme.tileHeight);
                                             layer.move('up', gameScheme.tileHeight);
                                         });
+                                        startX --;
+                                        startY --;
                                     }
-                                    startX --;
-                                    startY --;
                                     break;
                                 case 40:
                                     if (pressed) {
@@ -244,9 +244,9 @@
                                             layer.move("right", gameScheme.tileHeight);
                                             layer.move("left", gameScheme.tileHeight);
                                         });
+                                        startX ++;
+                                        startY ++;
                                     }
-                                    startX ++;
-                                    startY ++;
                                     break;
                                 case 37:
                                     if (pressed) {
@@ -254,9 +254,9 @@
                                             layer.move("up",gameScheme.tileHeight);
                                             layer.move("right",gameScheme.tileHeight);
                                         });
+                                        startX ++;
+                                        startY --;
                                     }
-                                    startX ++;
-                                    startY --;
                                     break;
                             }
                         });
