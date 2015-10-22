@@ -8,7 +8,7 @@
 
 function(Particle, utils) {
 
-  return function(ctx, x, y, pcount, loop, xboundRange, yboundRange) {
+  return function(ctx, x, y, pcount, loopJs, xboundRange, yboundRange) {
 
     return {
       particles: [],
@@ -76,7 +76,7 @@ function(Particle, utils) {
 
 
 
-            if (loop && loop !== "false" && !this.particles[i].active) {
+            if (loopJs && loopJs !== "false" && !this.particles[i].active) {
               this.particles[i] = this.CreateParticle(this.particles[i], true);
             }
 
@@ -100,7 +100,7 @@ function(Particle, utils) {
         else {
           p = new Particle();
         }
-        if (draw || loop === false || loop === "false") {
+        if (draw || loopJs === false || loopJs === "false") {
           p.active = true;
 
           if (x) {
