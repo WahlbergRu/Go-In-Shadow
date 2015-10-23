@@ -7,8 +7,41 @@ for canvas interaction
 
 **
 ###
-Class Input
+class Input
   constructor: (@doc, @canvas) ->
+
+  _keyboardInput = (e, callback, pressed) ->
+    console.log e
+    keyCode = undefined
+    if e == null
+      keyCode = window.e.keyCode
+    else
+      keyCode = e.keyCode
+    callback keyCode, pressed, e
+    return
+
+  _mobileInput = (e, callback, pressed) ->
+    coords = {}
+    if pressed
+      coords.x = e.touches[0].pageX - (canvas.offsetLeft)
+      coords.y = e.touches[0].pageY - (canvas.offsetTop)
+    callback coords, pressed
+    return
+
+  _mouseInput = (e, callback) ->
+    coords = {}
+    coords.x = e.pageX - (canvas.offsetLeft)
+    coords.y = e.pageY - (canvas.offsetTop)
+    callback coords
+    return
+
+  _orientationChange = (callback) ->
+    window.addEventListener 'orientationchange', (->
+      callback()
+      return
+    ), false
+    return
+  {
     keyboard: (callback) ->
       # Callback returns 2 paramaters:
       # -- Pressed keycode
@@ -64,35 +97,4 @@ Class Input
         return
       ), false
       return
-
-  _keyboardInput = (e, callback, pressed) ->
-    console.log e
-    keyCode = undefined
-    if e == null
-      keyCode = window.e.keyCode
-    else
-      keyCode = e.keyCode
-    callback keyCode, pressed, e
-    return
-
-  _mobileInput = (e, callback, pressed) ->
-    coords = {}
-    if pressed
-      coords.x = e.touches[0].pageX - (canvas.offsetLeft)
-      coords.y = e.touches[0].pageY - (canvas.offsetTop)
-    callback coords, pressed
-    return
-
-  _mouseInput = (e, callback) ->
-    coords = {}
-    coords.x = e.pageX - (canvas.offsetLeft)
-    coords.y = e.pageY - (canvas.offsetTop)
-    callback coords
-    return
-
-  _orientationChange = (callback) ->
-    window.addEventListener 'orientationchange', (->
-      callback()
-      return
-    ), false
-    return
+  }
