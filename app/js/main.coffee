@@ -1,8 +1,3 @@
-control = new Control()
-CanvasControl = control.getCanvas()
-
-
-
 init = (CanvasControl, CanvasInput, imgLoader, jsonLoader, TileField, pathfind, EffectLoader, utils) ->
   # -- FPS --------------------------------
   #TODO: сделать дравинг в зависимости от размера экрана

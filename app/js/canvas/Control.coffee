@@ -116,3 +116,5 @@ class Control
   # Return Canvas Object
   getCanvas: () -> canvas
 
+control = new Control()
+CanvasControl = control.getCanvas()
