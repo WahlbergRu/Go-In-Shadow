@@ -1,5 +1,5 @@
-CanvasControl = new Control()
-console.log(CanvasControl.getCanvas());
+control = new Control()
+CanvasControl = control.getCanvas()
 
 (CanvasControl, CanvasInput, imgLoader, jsonLoader, TileField, pathfind, EffectLoader, utils) ->
   # -- FPS --------------------------------
