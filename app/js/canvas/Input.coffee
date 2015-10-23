@@ -23,10 +23,12 @@ Class Input
         return
 
       return
+
     orientationChange: (callback) ->
       # Callback returns if orientation of screen is changed
       _orientationChange callback
       return
+
     mobile: (callback) ->
       touchendCoords = {}
       # Callback returns when screen is touched and when screen touch ends
@@ -44,6 +46,7 @@ Class Input
         callback touchendCoords, false
         return
       return
+
     mouse_action: (callback) ->
       # Callback returns on mouse down
       @canvas.addEventListener 'mousedown', ((event) ->
@@ -52,6 +55,7 @@ Class Input
         return
       ), false
       return
+
     mouse_move: (callback) ->
       # Callback returns when mouse is moved
       @canvas.addEventListener 'mousemove', ((event) ->
@@ -71,14 +75,6 @@ Class Input
     callback keyCode, pressed, e
     return
 
-  ###*
-  * Used for getting touch screen coordinates
-  * @param {Event} Event
-  * @param {Function} Callback function
-  * @param {Boolean} If the screen is being touched
-  * @return {Function} callback({Object} X & Y touch coordinates, {Boolean} pressed)
-  ###
-
   _mobileInput = (e, callback, pressed) ->
     coords = {}
     if pressed
@@ -87,25 +83,12 @@ Class Input
     callback coords, pressed
     return
 
-  ###*
-  * Used for getting mouse click coordinates
-  * @param {Event} Event
-  * @param {Function} Callback function
-  * @return {Function} callback({Object} X & Y mouse coordinates)
-  ###
-
   _mouseInput = (e, callback) ->
     coords = {}
     coords.x = e.pageX - (canvas.offsetLeft)
     coords.y = e.pageY - (canvas.offsetTop)
     callback coords
     return
-
-  ###*
-  * Performs the callback function when screen orientation change is detected
-  * @param {Function} Callback function
-  * @return {Function} callback()
-  ###
 
   _orientationChange = (callback) ->
     window.addEventListener 'orientationchange', (->
