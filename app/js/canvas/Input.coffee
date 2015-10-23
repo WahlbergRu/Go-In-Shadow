@@ -1,5 +1,3 @@
-#18.10.15 ��-����� ��� ����������. ���� ��� ����� ������ �����
-
 ###**
 
 jsiso/canvas/Input
@@ -9,21 +7,59 @@ for canvas interaction
 
 **
 ###
+Class Input
+  constructor: (@doc, @canvas) ->
+    keyboard: (callback) ->
+      # Callback returns 2 paramaters:
+      # -- Pressed keycode
+      # -- True if button is down / False if button is up
 
-# Return Input Class
-(doc, canvas) ->
-  # ----
-  # -- Public properties for Input
-  # ----
-  # Private properties for Input
+      @doc.onkeydown = (event) ->
+        _keyboardInput event, callback, true
+        return
 
-  ###*
-  * Used for getting keyboard interaction keycodes
-  * @param {Event} Event
-  * @param {Function} Callback function
-  * @param {Boolean} If the key is down or up
-  * @return {Function} callback({Number} keycode, {Boolean} pressed)
-  ###
+      @doc.onkeyup = (event) ->
+        _keyboardInput event, callback, false
+        return
+
+      return
+    orientationChange: (callback) ->
+      # Callback returns if orientation of screen is changed
+      _orientationChange callback
+      return
+    mobile: (callback) ->
+      touchendCoords = {}
+      # Callback returns when screen is touched and when screen touch ends
+      @canvas.addEventListener 'touchstart', ((event) ->
+        event.preventDefault()
+        _mobileInput event, ((coords, pressed) ->
+          touchendCoords = coords
+          callback coords, pressed
+          return
+        ), true
+        return
+      ), false
+      @canvas.addEventListener 'touchend', (event) ->
+        event.preventDefault()
+        callback touchendCoords, false
+        return
+      return
+    mouse_action: (callback) ->
+      # Callback returns on mouse down
+      @canvas.addEventListener 'mousedown', ((event) ->
+        event.preventDefault()
+        _mouseInput event, callback
+        return
+      ), false
+      return
+    mouse_move: (callback) ->
+      # Callback returns when mouse is moved
+      @canvas.addEventListener 'mousemove', ((event) ->
+        event.preventDefault()
+        _mouseInput event, callback
+        return
+      ), false
+      return
 
   _keyboardInput = (e, callback, pressed) ->
     console.log e
@@ -77,58 +113,3 @@ for canvas interaction
       return
     ), false
     return
-
-  {
-    keyboard: (callback) ->
-      # Callback returns 2 paramaters:
-      # -- Pressed keycode
-      # -- True if button is down / False if button is up
-
-      doc.onkeydown = (event) ->
-        _keyboardInput event, callback, true
-        return
-
-      doc.onkeyup = (event) ->
-        _keyboardInput event, callback, false
-        return
-
-      return
-    orientationChange: (callback) ->
-      # Callback returns if orientation of screen is changed
-      _orientationChange callback
-      return
-    mobile: (callback) ->
-      touchendCoords = {}
-      # Callback returns when screen is touched and when screen touch ends
-      canvas.addEventListener 'touchstart', ((event) ->
-        event.preventDefault()
-        _mobileInput event, ((coords, pressed) ->
-          touchendCoords = coords
-          callback coords, pressed
-          return
-        ), true
-        return
-      ), false
-      canvas.addEventListener 'touchend', (event) ->
-        event.preventDefault()
-        callback touchendCoords, false
-        return
-      return
-    mouse_action: (callback) ->
-      # Callback returns on mouse down
-      canvas.addEventListener 'mousedown', ((event) ->
-        event.preventDefault()
-        _mouseInput event, callback
-        return
-      ), false
-      return
-    mouse_move: (callback) ->
-      # Callback returns when mouse is moved
-      canvas.addEventListener 'mousemove', ((event) ->
-        event.preventDefault()
-        _mouseInput event, callback
-        return
-      ), false
-      return
-
-  }
