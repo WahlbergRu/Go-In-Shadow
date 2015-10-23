@@ -1,9 +1,12 @@
 control = new Control()
 CanvasControl = control.getCanvas()
 
-(CanvasControl, CanvasInput, imgLoader, jsonLoader, TileField, pathfind, EffectLoader, utils) ->
+
+
+init = (CanvasControl, CanvasInput, imgLoader, jsonLoader, TileField, pathfind, EffectLoader, utils) ->
   # -- FPS --------------------------------
   #TODO: сделать дравинг в зависимости от размера экрана
+
   launch = ->
     jsonLoader([
       gameScheme.map
@@ -222,3 +225,5 @@ CanvasControl = control.getCanvas()
     imageFiles: 'imageFiles.json'
   launch()
   return
+
+init(CanvasControl)
