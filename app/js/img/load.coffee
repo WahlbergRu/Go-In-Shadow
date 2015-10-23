@@ -19,7 +19,8 @@
 }]
 ###
 
-(graphics) ->
+class ImgLoad
+  setGraphics(graphics) ->
 
   ###*
   # Breaks up a solid image into smaller images via canvas and returns the individual sprite graphics and individual ones
@@ -124,3 +125,6 @@
     Promise.all promises
   else
     _imgPromise(graphics)
+
+ImgLoadClass = new ImgLoad()
+imgLoader = ImgLoadClass.setGraphics()

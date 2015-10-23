@@ -1,4 +1,4 @@
-init = (CanvasControl, CanvasInput, imgLoader, jsonLoader, TileField, pathfind, EffectLoader, utils) ->
+init = (CanvasControl, CanvasInput, imgLoader, jsonLoader, TileField) ->
   # -- FPS --------------------------------
   #TODO: сделать дравинг в зависимости от размера экрана
 
