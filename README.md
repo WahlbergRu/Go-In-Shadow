@@ -6,3 +6,5 @@ Run in different console, in webstorm or other npm-terminal
 npm-start
 npm run serverInit
 ```
+
+tech: coffeescript, jsiso, html5Canvas
