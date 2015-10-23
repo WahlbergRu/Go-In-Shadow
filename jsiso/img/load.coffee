@@ -68,7 +68,7 @@ define ->
             j++
           i++
         return
-
+      )
     ###*
     # Takes an individual set of graphics whether a singular image, an array of images, or spritesheet and loads it for using within JsIso
     # @param  {Object} graphic a single graphic set with the optional spritesheet paramaters for preloading
@@ -114,6 +114,7 @@ define ->
           while i < graphic.graphics.length
             graphic.graphics[i] = graphic.graphics[i].split('/').pop()
             i++
+      )
 
     if Object::toString.call(graphics) == '[object Array]'
       promises = []
