@@ -1,6 +1,7 @@
 #18.10.15 ��������� ������
 define ->
   # Private properties for Control
+  wahlberg = null
   canvasElement = null
   width = null
   height = null
