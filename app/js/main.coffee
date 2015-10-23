@@ -1,3 +1,6 @@
+CanvasControl = new Control()
+console.log(CanvasControl.getCanvas());
+
 (CanvasControl, CanvasInput, imgLoader, jsonLoader, TileField, pathfind, EffectLoader, utils) ->
   # -- FPS --------------------------------
   #TODO: сделать дравинг в зависимости от размера экрана
@@ -190,7 +193,8 @@
             startX++
             startY--
       return
-    { init: (layers) ->
+
+      init: (layers) ->
       i = 0
       while i < 0 + layers.length
         mapLayers[i] = new TileField(context, CanvasControl().height, CanvasControl().width)
@@ -201,7 +205,7 @@
         i++
       draw()
       return
- }
+
 
   window.requestAnimFrame = do ->
     window.requestAnimationFrame or window.webkitRequestAnimationFrame or window.mozRequestAnimationFrame or window.oRequestAnimationFrame or window.msRequestAnimationFrame or (callback, element) ->
