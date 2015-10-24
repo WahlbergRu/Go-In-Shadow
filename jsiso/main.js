@@ -10,7 +10,6 @@ require([
             'requirejs/domReady!'
         ],
         function(CanvasControl, CanvasInput, imgLoader, jsonLoader, TileField, pathfind, EffectLoader, utils) {
-
             // -- FPS --------------------------------
             window.requestAnimFrame = (function() {
                 return window.requestAnimationFrame ||

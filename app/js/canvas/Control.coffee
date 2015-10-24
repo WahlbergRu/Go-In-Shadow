@@ -115,6 +115,3 @@ class Control
   canvas.style = _style
   # Return Canvas Object
   getCanvas: () -> canvas
-
-control = new Control()
-CanvasControl = control.getCanvas()

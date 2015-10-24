@@ -1,13 +1,13 @@
-init = (CanvasControl, CanvasInput, imgLoader, jsonLoader, TileField) ->
-  # -- FPS --------------------------------
+init = (TileField) ->
+# -- FPS --------------------------------
+#  input = new Input(document, CanvasControl)
   #TODO: сделать дравинг в зависимости от размера экрана
-
   launch = ->
-    jsonLoader([
+    new JsonLoader([
       gameScheme.map
       gameScheme.imageFiles
     ]).then (jsonResponse) ->
-      imgLoader([ { graphics: jsonResponse[1].images } ]).then (imgResponse) ->
+      new ImgLoader([{ graphics: jsonResponse[1].images }]).then (imgResponse) ->
         game = new main(0, 0, 20, 20)
         # X & Y drawing position, and tile span to draw - малая карта
         # var game = new main(45, 45, 45, 45);// X & Y drawing position, and tile span to draw - большая карта
@@ -56,11 +56,17 @@ init = (CanvasControl, CanvasInput, imgLoader, jsonLoader, TileField) ->
     rangeX = xrange
     rangeY = yrange
     defaultRangeY = rangeY
+
+    control = new Control()
+    CanvasControl = control.getCanvas()
+
+
     context = CanvasControl.create('canavas', 920, 600,
       background: '#000022'
       display: 'block'
       marginLeft: 'auto'
       marginRight: 'auto')
+
 
     draw = ->
       context.clearRect 0, 0, CanvasControl().width, CanvasControl().height
@@ -77,7 +83,12 @@ init = (CanvasControl, CanvasInput, imgLoader, jsonLoader, TileField) ->
       return
 
     CanvasControl.fullScreen()
-    input = new CanvasInput(document, CanvasControl())
+
+    myInput = new Input()
+    input = myInput.getInput(document, CanvasControl())
+
+    console.log(input)
+
     input.mouse_action (coords) ->
       mapLayers.map (layer) ->
         #                                console.log(layer.getHeightMapTile());
@@ -89,12 +100,14 @@ init = (CanvasControl, CanvasInput, imgLoader, jsonLoader, TileField) ->
         # Force the chaning of tile graphic
         return
       return
+
     input.mouse_move (coords) ->
       mapLayers.map (layer) ->
         tile_coordinates = layer.applyMouseFocus(coords.x, coords.y)
         # Apply mouse rollover via mouse location X & Y
         return
       return
+
     input.keyboard (keyCode, pressed, e) ->
       #Светить в консоли кейкод
       console.log keyCode
@@ -216,9 +229,10 @@ init = (CanvasControl, CanvasInput, imgLoader, jsonLoader, TileField) ->
   gameScheme = 
     tileHeight: 43
     tileWidth: 100
-    map: 'mapSmall.json'
-    imageFiles: 'imageFiles.json'
+    map: 'json/mapSmall.json'
+    imageFiles: 'json/imageFiles.json'
+
   launch()
   return
 
-init(CanvasControl)
+init()
