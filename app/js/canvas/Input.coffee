@@ -8,7 +8,7 @@ for canvas interaction
 **
 ###
 class Input
-  constructor: (@doc, @canvas) ->
+  constructor: (doc, canvas) ->
     _keyboardInput = (e, callback, pressed) ->
       console.log e
       keyCode = undefined
@@ -22,15 +22,15 @@ class Input
     _mobileInput = (e, callback, pressed) ->
       coords = {}
       if pressed
-        coords.x = e.touches[0].pageX - (@canvas.offsetLeft)
-        coords.y = e.touches[0].pageY - (@canvas.offsetTop)
+        coords.x = e.touches[0].pageX - (canvas.offsetLeft)
+        coords.y = e.touches[0].pageY - (canvas.offsetTop)
       callback coords, pressed
       return
 
     _mouseInput = (e, callback) ->
       coords = {}
-      coords.x = e.pageX - (@canvas.offsetLeft)
-      coords.y = e.pageY - (@canvas.offsetTop)
+      coords.x = e.pageX - (canvas.offsetLeft)
+      coords.y = e.pageY - (canvas.offsetTop)
       callback coords
       return
 
@@ -47,11 +47,11 @@ class Input
         # -- Pressed keycode
         # -- True if button is down / False if button is up
 
-        @doc.onkeydown = (event) ->
+        doc.onkeydown = (event) ->
           _keyboardInput event, callback, true
           return
 
-        @doc.onkeyup = (event) ->
+        doc.onkeyup = (event) ->
           _keyboardInput event, callback, false
           return
 
@@ -65,7 +65,7 @@ class Input
       mobile: (callback) ->
         touchendCoords = {}
         # Callback returns when screen is touched and when screen touch ends
-        @canvas.addEventListener 'touchstart', ((event) ->
+        canvas.addEventListener 'touchstart', ((event) ->
           event.preventDefault()
           _mobileInput event, ((coords, pressed) ->
             touchendCoords = coords
@@ -74,7 +74,7 @@ class Input
           ), true
           return
         ), false
-        @canvas.addEventListener 'touchend', (event) ->
+        canvas.addEventListener 'touchend', (event) ->
           event.preventDefault()
           callback touchendCoords, false
           return
@@ -82,7 +82,7 @@ class Input
 
       mouse_action: (callback) ->
         # Callback returns on mouse down
-        @canvas.addEventListener 'mousedown', ((event) ->
+        canvas.addEventListener 'mousedown', ((event) ->
           event.preventDefault()
           _mouseInput event, callback
           return
@@ -91,7 +91,7 @@ class Input
 
       mouse_move: (callback) ->
         # Callback returns when mouse is moved
-        @canvas.addEventListener 'mousemove', ((event) ->
+        canvas.addEventListener 'mousemove', ((event) ->
           event.preventDefault()
           _mouseInput event, callback
           return
