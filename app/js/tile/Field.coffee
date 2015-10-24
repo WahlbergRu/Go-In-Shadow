@@ -1,5 +1,8 @@
-(EffectLoader, Emitter, utils) ->
-  (ctx, mapWidth, mapHeight, mapLayout) ->
+#(EffectLoader, Emitter, utils) ->
+
+
+class Field
+  constructor:(ctx, mapWidth, mapHeight, mapLayout) ->
     title = ''
     zeroIsBlank = false
     stackTiles = false
@@ -535,7 +538,7 @@
       mapLayout = utils.rotateTwoDArray(mapLayout, setting)
       return
 
-    {
+    return {
       setup: (settings) ->
         _setup settings
       draw: (tileX, tileY, tileImageOverwite) ->

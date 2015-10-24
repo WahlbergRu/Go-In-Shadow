@@ -6,6 +6,7 @@ class Control
   canvasElement = null
   width = null
   height = null
+
   # ----
   # -- Public properties for Control
   # ----

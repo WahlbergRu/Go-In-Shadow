@@ -41,7 +41,7 @@ init = (TileField) ->
     dictionary.forEach (tile, i) ->
       `var clickTile`
       clickTile = document.createElement('a')
-      clickTile.innerHTML += '<img  height=\'50\' width=\'50\' src=\'../img/Grass/' + tile + '\' />'
+      clickTile.innerHTML += '<img  height=\'50\' width=\'50\' src=\'../../assets/img/Grass/' + tile + '\' />'
       document.getElementById('gameInfo').appendChild clickTile
       clickTile.addEventListener 'click', (e) ->
         tileChoice layer, i + offset
@@ -67,26 +67,9 @@ init = (TileField) ->
       marginLeft: 'auto'
       marginRight: 'auto')
 
-
-    draw = ->
-      context.clearRect 0, 0, CanvasControl().width, CanvasControl().height
-      i = startY
-      while i < startY + rangeY
-        j = startX
-        while j < startX + rangeX
-          mapLayers.map (layer) ->
-            layer.draw i, j
-            return
-          j++
-        i++
-      requestAnimFrame draw
-      return
-
     CanvasControl.fullScreen()
 
     input =  new Input(document, CanvasControl())
-
-    console.log(input)
 
     input.mouse_action (coords) ->
       mapLayers.map (layer) ->
@@ -204,18 +187,32 @@ init = (TileField) ->
             startY--
       return
 
-      init: (layers) ->
-      i = 0
-      while i < 0 + layers.length
-        mapLayers[i] = new TileField(context, CanvasControl().height, CanvasControl().width)
-        mapLayers[i].setup layers[i]
-        mapLayers[i].align 'h-center', CanvasControl().width, xrange + startX, 0
-        mapLayers[i].align 'v-center', CanvasControl().height, yrange + startY, yrange + startY
-        mapLayers[i].setZoom 'in'
-        i++
-      draw()
-      return
 
+    draw = ->
+      context.clearRect 0, 0, CanvasControl().width, CanvasControl().height
+      i = startY
+      while i < startY + rangeY
+        j = startX
+        while j < startX + rangeX
+          mapLayers.map (layer) ->
+            layer.draw i, j
+            return
+          j++
+        i++
+      requestAnimFrame draw
+
+    return {
+      init: (layers) ->
+        i = 0
+        while i < 0 + layers.length
+          mapLayers[i] = new Field(context, CanvasControl().height, CanvasControl().width)
+          mapLayers[i].setup layers[i]
+          mapLayers[i].align 'h-center', CanvasControl().width, xrange + startX, 0
+          mapLayers[i].align 'v-center', CanvasControl().height, yrange + startY, yrange + startY
+          mapLayers[i].setZoom 'in'
+          i++
+        draw()
+    }
 
   window.requestAnimFrame = do ->
     window.requestAnimationFrame or window.webkitRequestAnimationFrame or window.mozRequestAnimationFrame or window.oRequestAnimationFrame or window.msRequestAnimationFrame or (callback, element) ->
