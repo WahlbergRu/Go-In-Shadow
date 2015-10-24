@@ -42,58 +42,60 @@ class Input
 
 
   getInput = (doc, canvas) ->
-    keyboard: (callback) ->
-      # Callback returns 2 paramaters:
-      # -- Pressed keycode
-      # -- True if button is down / False if button is up
+    return {
+      keyboard: (callback) ->
+        # Callback returns 2 paramaters:
+        # -- Pressed keycode
+        # -- True if button is down / False if button is up
 
-      doc.onkeydown = (event) ->
-        _keyboardInput event, callback, true
-        return
-
-      doc.onkeyup = (event) ->
-        _keyboardInput event, callback, false
-        return
-
-      return
-
-    orientationChange: (callback) ->
-      # Callback returns if orientation of screen is changed
-      _orientationChange callback
-      return
-
-    mobile: (callback) ->
-      touchendCoords = {}
-      # Callback returns when screen is touched and when screen touch ends
-      canvas.addEventListener 'touchstart', ((event) ->
-        event.preventDefault()
-        _mobileInput event, ((coords, pressed) ->
-          touchendCoords = coords
-          callback coords, pressed
+        doc.onkeydown = (event) ->
+          _keyboardInput event, callback, true
           return
-        ), true
-        return
-      ), false
-      canvas.addEventListener 'touchend', (event) ->
-        event.preventDefault()
-        callback touchendCoords, false
-        return
-      return
 
-    mouse_action: (callback) ->
-      # Callback returns on mouse down
-      canvas.addEventListener 'mousedown', ((event) ->
-        event.preventDefault()
-        _mouseInput event, callback
-        return
-      ), false
-      return
+        doc.onkeyup = (event) ->
+          _keyboardInput event, callback, false
+          return
 
-    mouse_move: (callback) ->
-      # Callback returns when mouse is moved
-      canvas.addEventListener 'mousemove', ((event) ->
-        event.preventDefault()
-        _mouseInput event, callback
         return
-      ), false
-      return
+
+      orientationChange: (callback) ->
+        # Callback returns if orientation of screen is changed
+        _orientationChange callback
+        return
+
+      mobile: (callback) ->
+        touchendCoords = {}
+        # Callback returns when screen is touched and when screen touch ends
+        canvas.addEventListener 'touchstart', ((event) ->
+          event.preventDefault()
+          _mobileInput event, ((coords, pressed) ->
+            touchendCoords = coords
+            callback coords, pressed
+            return
+          ), true
+          return
+        ), false
+        canvas.addEventListener 'touchend', (event) ->
+          event.preventDefault()
+          callback touchendCoords, false
+          return
+        return
+
+      mouse_action: (callback) ->
+        # Callback returns on mouse down
+        canvas.addEventListener 'mousedown', ((event) ->
+          event.preventDefault()
+          _mouseInput event, callback
+          return
+        ), false
+        return
+
+      mouse_move: (callback) ->
+        # Callback returns when mouse is moved
+        canvas.addEventListener 'mousemove', ((event) ->
+          event.preventDefault()
+          _mouseInput event, callback
+          return
+        ), false
+        return
+    }
