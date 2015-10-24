@@ -84,8 +84,7 @@ init = (TileField) ->
 
     CanvasControl.fullScreen()
 
-    myInput = new Input()
-    input = myInput.getInput(document, CanvasControl())
+    input =  new Input(document, CanvasControl())
 
     console.log(input)
 
