@@ -1,8 +1,10 @@
-#define [ 'jsiso/utils' ],
-(utils) ->
-  ->
+#_require Utils.coffee
+
+class Particle
+  utils = new Utils()
+  constructor: () ->
     age = 0
-    {
+    return {
       active: false
       drawdelay: -1
       life: 0

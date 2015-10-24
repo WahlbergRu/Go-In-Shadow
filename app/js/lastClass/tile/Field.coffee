@@ -3,6 +3,11 @@
 
 class Field
   constructor:(ctx, mapWidth, mapHeight, mapLayout) ->
+    #class
+    utils = new Utils()
+    emitter = new Emitter()
+    effectLoader = new EffectLoader()
+
     title = ''
     zeroIsBlank = false
     stackTiles = false
@@ -127,12 +132,12 @@ class Field
             particleMapHolder[i] = []
           if !particleMapHolder[i][j]
             if particleEffects and particleEffects[particleMap[i][j]]
-              particleMapHolder[i][j] = new Emitter(ctx, 0, 0, particleEffects[particleMap[i][j]].pcount, particleEffects[particleMap[i][j]].loop, utils.range(0, mapHeight), utils.range(0, mapWidth))
+              particleMapHolder[i][j] = new emitter(ctx, 0, 0, particleEffects[particleMap[i][j]].pcount, particleEffects[particleMap[i][j]].loop, utils.range(0, mapHeight), utils.range(0, mapWidth))
               for partK of particleEffects[particleMap[i][j]]
                 particleMapHolder[i][j][partK] = particleEffects[particleMap[i][j]][partK]
               particleMapHolder[i][j].Load()
             else
-              particleMapHolder[i][j] = (new EffectLoader).getEffect(particleMap[i][j], ctx, utils.range(0, mapHeight), utils.range(0, mapWidth))
+              particleMapHolder[i][j] = (new effectLoader).getEffect(particleMap[i][j], ctx, utils.range(0, mapHeight), utils.range(0, mapWidth))
           particleMapHolder[i][j].Draw xpos, ypos + (stack - 1) * (tileHeight - heightOffset - tileHeight) * curZoom - ((resizedTileHeight - tileHeight) * curZoom), curZoom
       return
 

@@ -1,10 +1,3 @@
-###
-- Author : Iain M Hamilton - <iain@beakable.com> - http://www.beakable.com
-  Twitter: @beakable
-###
-
-###* jsiso/utils simple common functions used throughout JsIso *###
-
 class Utils
   constructor: () ->
     return {
@@ -113,3 +106,5 @@ class Utils
           textLines.push line
         textLines
     }
+
+console.log(new Utils())

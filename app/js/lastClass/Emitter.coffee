@@ -1,9 +1,14 @@
 #define [
-#  'jsiso/particles/Particle'
+#  'jsiso/particles/particle'
 #  'jsiso/utils'
 #],
-(Particle, utils) ->
-  (ctx, x, y, pcount, loopJs, xboundRange, yboundRange) ->
+#_require Particle.coffee
+#_require Utils.coffee
+
+class Emitter
+   utils = new Utils()
+   particle = new Particle(utils)
+   constructor:(ctx, x, y, pcount, loopJs, xboundRange, yboundRange) ->
     {
       particles: []
       xshiftOffset: 0
@@ -34,7 +39,7 @@
         @particles = []
         i = 0
         while i < pcount
-          @particles.push @CreateParticle(false, false, x, y)
+          @particles.push @Createparticle(false, false, x, y)
           i++
         @loaded = true
         return
@@ -65,18 +70,18 @@
             @particles[i].y += @yshiftOffset
             @particles[i].Draw ctx
             if loopJs and loopJs != 'false' and !@particles[i].active
-              @particles[i] = @CreateParticle(@particles[i], true)
+              @particles[i] = @Createparticle(@particles[i], true)
             i++
           ctx.restore()
           @xshiftOffset = 0
           @yshiftOffset = 0
         return
-      CreateParticle: (reload, draw, x, y) ->
+      Createparticle: (reload, draw, x, y) ->
         p = undefined
         if reload
           p = reload
         else
-          p = new Particle
+          p = new particle
         if draw or loopJs == false or loopJs == 'false'
           p.active = true
           if x

@@ -4,7 +4,7 @@
   "description": "html5 game",
   "scripts": {
     "prestart": "npm install",
-    "start": "coffee -wcj app/bundle.js app/js/",
+    "start": "coffee -wcj app/bundle.js app/js/baseClass/ app/js/depencyClass/ app/js/lastClass/ app/js/main.coffee",
     "serverInit":"http-server -a localhost -p 8000 --cors -c-1 -o"
   },
   "repository": {
