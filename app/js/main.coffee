@@ -16,15 +16,18 @@ init = (TileField) ->
           layout: jsonResponse[0].ground
           graphics: imgResponse[0].files
           graphicsDictionary: imgResponse[0].dictionary
+          applyInteractions: true
           heightMap:
             map: jsonResponse[0].height
-            offset: -80
+            offset: 0
             heightTile: imgResponse[0].files['ground.png']
           tileHeight: gameScheme.tileHeight
           tileWidth: gameScheme.tileWidth
           zeroIsBlank: true
         } ]
         addTilesToHUD 'Graphics', imgResponse[0].dictionary, 1
+
+
         return
       return
     return
@@ -39,7 +42,6 @@ init = (TileField) ->
   addTilesToHUD = (layer, dictionary, offset) ->
     clickTile = undefined
     dictionary.forEach (tile, i) ->
-      `var clickTile`
       clickTile = document.createElement('a')
       clickTile.innerHTML += '<img  height=\'50\' width=\'50\' src=\'../../assets/img/Grass/' + tile + '\' />'
       document.getElementById('gameInfo').appendChild clickTile
@@ -76,7 +78,7 @@ init = (TileField) ->
         #                                console.log(layer.getHeightMapTile());
         tile_coordinates = layer.applyMouseFocus(coords.x, coords.y)
         # Get the current mouse location from X & Y Coords
-        console.log coords
+#        console.log coords
         #layer.setHeightmapTile(tile_coordinates.x, tile_coordinates.y, layer.getHeightMapTile(tile_coordinates.x, tile_coordinates.y) + 1); // Increase heightmap tile
         layer.setTile tile_coordinates.x, tile_coordinates.y, tileSelection.value
         # Force the chaning of tile graphic
@@ -85,7 +87,10 @@ init = (TileField) ->
 
     input.mouse_move (coords) ->
       mapLayers.map (layer) ->
-        tile_coordinates = layer.applyMouseFocus(coords.x, coords.y)
+        tile_coordinates = layer.applyMouseFocus coords.x, coords.y
+        console.log tile_coordinates
+
+
         # Apply mouse rollover via mouse location X & Y
         return
       return
@@ -223,9 +228,9 @@ init = (TileField) ->
   tileSelection = {}
   # ---------------------------------------
   gameScheme = 
-    tileHeight: 43
-    tileWidth: 100
-    map: 'json/mapSmall.json'
+    tileHeight: 64
+    tileWidth: 128
+    map: 'json/mapSmall2.json'
     imageFiles: 'json/imageFiles.json'
 
   launch()

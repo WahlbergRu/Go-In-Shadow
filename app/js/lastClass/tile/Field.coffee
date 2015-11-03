@@ -87,6 +87,7 @@ class Field
     # Used for drawing horizontal shadows on top of tiles or RGBA tiles when color value is passed
 
     _drawHorizontalColorOverlay = (xpos, ypos, graphicValue, stack, resizedTileHeight) ->
+      #Отрисовка на взаимодействие с мышкой
       if !isometric
         ctx.fillStyle = 'rgba' + graphicValue
         ctx.beginPath()
@@ -108,6 +109,7 @@ class Field
         ctx.lineTo xpos + tileHeight * curZoom * 2, ypos + (stack - 1) * tileOffset + tileHeight * curZoom / 2
         ctx.lineTo xpos + tileHeight * curZoom, ypos + (stack - 1) * tileOffset + tileHeight * curZoom
         ctx.fill()
+
       return
 
     # Used for drawing vertical shadows on top of tiles in isometric view if switched on
@@ -211,6 +213,11 @@ class Field
           xpos = i * tileHeight * curZoom + drawX
           ypos = j * tileWidth * curZoom + drawY
         else
+        #Магия
+        #Отрисовка сетки
+        #Отрисовка позиции 02.11.15
+        #отрисовка в засимисти от мышки 03.11.15
+
           xpos = (i - j) * tileHeight * curZoom + drawX
           ypos = (i + j) * tileWidth / 4 * curZoom + drawY
         if !stackTiles
@@ -433,23 +440,22 @@ class Field
       }
 
     _applyMouseFocus = (x, y, h) ->
-      # h - ������ �����
-      h = 50
+      # h - Высота тайла
+      h = 64
       mouseUsed = true
       if !isometric
         focusTilePosY = Math.round((y - (tileWidth * curZoom / 2)) / (tileWidth * curZoom))
         focusTilePosX = Math.round((x - (tileHeight * curZoom / 2)) / (tileHeight * curZoom))
       else
         #��� ������, ���� � �������
-        if h
-          focusTilePosY = (2 * (y - drawY) - x + drawX) / 2 - 100
-        else
-          focusTilePosY = (2 * (y - drawY) - x + drawX) / 2
+
+#        console.log(tileHeight);
+        focusTilePosY = (2 * (y - drawY) - x + drawX) / 2
         focusTilePosX = x + focusTilePosY - drawX - (tileHeight * curZoom)
-        #console.log(focusTilePosX,focusTilePosY);
+#        console.log(focusTilePosX,focusTilePosY);
         focusTilePosY = Math.round(focusTilePosY / (tileHeight * curZoom))
         focusTilePosX = Math.round(focusTilePosX / (tileHeight * curZoom))
-        #console.log(focusTilePosX,focusTilePosY);
+#        console.log(focusTilePosX,focusTilePosY);
       {
         x: focusTilePosX
         y: focusTilePosY
@@ -546,85 +552,105 @@ class Field
     return {
       setup: (settings) ->
         _setup settings
+
       draw: (tileX, tileY, tileImageOverwite) ->
         _draw tileX, tileY, tileImageOverwite
+
       stackTiles: (settings) ->
         _stackTiles settings
+
       particleTiles: (map) ->
         _particleTiles map
+
       getLayout: ->
         _getLayout()
+
       setLayout: (data, width) ->
         _setLayout data, width
-        return
+
       getHeightLayout: ->
         _getHeightLayout()
+
       getTitle: ->
         title
+
       getTile: (tileX, tileY) ->
         Number _getTile(tileX, tileY)
+
       getHeightMapTile: (tileX, tileY) ->
         Number _getHeightMapTile(tileX, tileY)
+
       setTile: (tileX, tileY, val) ->
         _setTile tileX, tileY, val
-        return
+
       setHeightmapTile: (tileX, tileY, val) ->
         _setHeightmapTile tileX, tileY, val
-        return
+
       setZoom: (direction) ->
         # in || out
         _setZoom direction
+
       setLight: (tileX, tileY) ->
         _setLight tileX, tileY
+
       setLightmap: (lightmap) ->
         _setLightmap lightmap
-        return
+
       setParticlemapTile: (tileX, tileY, val) ->
         _setParticlemapTile tileX, tileY, val
-        return
+
       clearParticlemap: ->
         particleMap = []
-        return
+
       getXYCoords: (XPosition, YPosition) ->
         _getXYCoords XPosition, YPosition
+
       applyMouseFocus: (mouseXPosition, mouseYPosition) ->
         _applyMouseFocus mouseXPosition, mouseYPosition
+
       applyFocus: (tileX, tileY) ->
         _applyFocus tileX, tileY
+
       align: (position, screenDimension, size, offset) ->
         _align position, screenDimension, size, offset
+
       hideGraphics: (toggle, settings) ->
         _hideGraphics toggle, settings
+
       tileInView: (tileX, tileY) ->
         _tileInView tileX, tileY
+
       applyHeightShadow: (toggle, settings) ->
         _applyHeightShadow toggle, settings
+
       rotate: (direction) ->
         # left || right
         _rotate direction
+
       flip: (direction) ->
         # horizontal || vertical
         _flip direction
+
       toggleGraphicsHide: (toggle) ->
         if tilesHide != null
           _hideGraphics toggle
-        return
+
       toggleHeightShadow: (toggle) ->
         if heightShadows != null
           _applyHeightShadow toggle
-        return
+
       setLightness: (setting) ->
         shadowDistance.distance = setting
-        return
+
       adjustLightness: (setting, increase) ->
         _adjustLight setting, increase
-        return
+
       setOffset: (x, y) ->
         if x != null
           drawX = x
         if y != null
           drawY = y
-        return
+
       getTilePos: (x, y) ->
         _getTilePos x, y
       getOffset: ->
@@ -634,11 +660,14 @@ class Field
         }
       getLightness: ->
         shadowDistance.distance
+
       move: (direction, distance) ->
         # left || right || up || down
         particle = undefined
         subPart = undefined
         distance = distance or tileHeight
+        console.log(curZoom)
+        #smotret' tut
         if isometric
           if direction == 'up'
             drawY += distance / 2 * curZoom
@@ -653,6 +682,8 @@ class Field
             drawY -= distance / 2 * curZoom
             drawX += distance * curZoom
         else
+          #Это нас не интересует
+          #TODO: убрать всё что не измотрика
           if direction == 'up'
             drawY += distance * curZoom
             # Offset moving for particle effect particles
@@ -685,6 +716,5 @@ class Field
               for subPart of particleMapHolder[particle]
                 `subPart = subPart`
                 particleMapHolder[particle][subPart].ShiftBy -distance * curZoom, 0
-        return
 
     }
