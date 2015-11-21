@@ -8,25 +8,27 @@ init = (TileField) ->
       gameScheme.imageFiles
     ]).then (jsonResponse) ->
       new ImgLoader([{ graphics: jsonResponse[1].images }]).then (imgResponse) ->
+        #TODO: 20, 20 - эти цифры должны заменится размером раб. области (экран, тач)
         game = new main(0, 0, 20, 20)
+#         heightMap:
+#           map: jsonResponse[0].height
+#           offset: 0
+#           heightTile: imgResponse[0].files['ground.png']
+
         # X & Y drawing position, and tile span to draw - малая карта
-        # var game = new main(45, 45, 45, 45);// X & Y drawing position, and tile span to draw - большая карта
+
         game.init [ {
           Title: 'Graphics'
-          layout: jsonResponse[0].ground
+          layout: jsonResponse[0][0]
           graphics: imgResponse[0].files
           graphicsDictionary: imgResponse[0].dictionary
-          applyInteractions: true
-          heightMap:
-            map: jsonResponse[0].height
-            offset: 0
-            heightTile: imgResponse[0].files['ground.png']
+          heightTile: 128
           tileHeight: gameScheme.tileHeight
           tileWidth: gameScheme.tileWidth
           zeroIsBlank: true
         } ]
-        addTilesToHUD 'Graphics', imgResponse[0].dictionary, 1
 
+        addTilesToHUD 'Graphics', imgResponse[0].dictionary, 1
 
         return
       return
@@ -78,8 +80,8 @@ init = (TileField) ->
         #                                console.log(layer.getHeightMapTile());
         tile_coordinates = layer.applyMouseFocus(coords.x, coords.y)
         # Get the current mouse location from X & Y Coords
-#        console.log coords
-        #layer.setHeightmapTile(tile_coordinates.x, tile_coordinates.y, layer.getHeightMapTile(tile_coordinates.x, tile_coordinates.y) + 1); // Increase heightmap tile
+        # console.log coords
+        # layer.setHeightmapTile(tile_coordinates.x, tile_coordinates.y, layer.getHeightMapTile(tile_coordinates.x, tile_coordinates.y) + 1); // Increase heightmap tile
         layer.setTile tile_coordinates.x, tile_coordinates.y, tileSelection.value
         # Force the chaning of tile graphic
         return
@@ -88,7 +90,6 @@ init = (TileField) ->
     input.mouse_move (coords) ->
       mapLayers.map (layer) ->
         tile_coordinates = layer.applyMouseFocus coords.x, coords.y
-        console.log tile_coordinates
 
 
         # Apply mouse rollover via mouse location X & Y
@@ -97,25 +98,28 @@ init = (TileField) ->
 
     input.keyboard (keyCode, pressed, e) ->
       #Светить в консоли кейкод
-      console.log keyCode
+#      console.log keyCode
       switch keyCode
-        when 65
-          #a - отдалить
+        when 74
+          #j - отдалить
           mapLayers.map (layer) ->
-            if startY + rangeY + 1 < mapLayers[0].getLayout().length
+            console.log();
+            if rangeY + 1 < 25
               layer.setZoom 'out'
-              layer.align 'h-center', CanvasControl().width, xrange, -60
-              layer.align 'v-center', CanvasControl().height, yrange, 240
+              layer.align 'h-center', CanvasControl().width, xrange, -0
+              layer.align 'v-center', CanvasControl().height, yrange, 0
               rangeX += 1
               rangeY += 1
             return
-        when 83
-          #s - приблизить
+        when 75
+          #k - приблизить
+          console.log();
+
           mapLayers.map (layer) ->
             if rangeY - 1 > defaultRangeY - 1
               layer.setZoom 'in'
-              layer.align 'h-center', CanvasControl().width, xrange, -60
-              layer.align 'v-center', CanvasControl().height, yrange, 240
+              layer.align 'h-center', CanvasControl().width, xrange, -0
+              layer.align 'v-center', CanvasControl().height, yrange, 0
               rangeX -= 1
               rangeY -= 1
             return
@@ -209,13 +213,16 @@ init = (TileField) ->
     return {
       init: (layers) ->
         i = 0
+#        console.log(layers)
         while i < 0 + layers.length
+#          console.log(layers[i])
           mapLayers[i] = new Field(context, CanvasControl().height, CanvasControl().width)
           mapLayers[i].setup layers[i]
           mapLayers[i].align 'h-center', CanvasControl().width, xrange + startX, 0
           mapLayers[i].align 'v-center', CanvasControl().height, yrange + startY, yrange + startY
           mapLayers[i].setZoom 'in'
           i++
+#        console.log(mapLayers);
         draw()
     }
 
@@ -230,7 +237,7 @@ init = (TileField) ->
   gameScheme = 
     tileHeight: 64
     tileWidth: 128
-    map: 'json/mapSmall2.json'
+    map: 'json/mapHeight.json'
     imageFiles: 'json/imageFiles.json'
 
   launch()

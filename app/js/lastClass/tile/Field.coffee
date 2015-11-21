@@ -62,8 +62,9 @@ class Field
         isometric = settings.isometric
       if settings.shadow
         _applyHeightShadow true, settings.shadow
-      if settings.heightMap
-        _stackTiles settings.heightMap
+      if settings.heightTile
+#        console.log(settings.heightTile);
+        _stackTiles settings.heightTile
       if settings.particleEffects
         particleEffects = settings.particleEffects
       if settings.width
@@ -84,10 +85,10 @@ class Field
       alphaWhenFocusBehind = settings.alphaWhenFocusBehind
       return
 
-    # Used for drawing horizontal shadows on top of tiles or RGBA tiles when color value is passed
+    #Used for drawing horizontal shadows on top of tiles or RGBA tiles when color value is passed
+    #Отрисовка на взаимодействие с мышкой
 
     _drawHorizontalColorOverlay = (xpos, ypos, graphicValue, stack, resizedTileHeight) ->
-      #Отрисовка на взаимодействие с мышкой
       if !isometric
         ctx.fillStyle = 'rgba' + graphicValue
         ctx.beginPath()
@@ -99,9 +100,9 @@ class Field
       else
         tileOffset = undefined
         if tileHeight < resizedTileHeight
-          tileOffset = (tileHeight - resizedTileHeight) * curZoom
+          tileOffset = (96+tileHeight - resizedTileHeight) * curZoom
         else
-          tileOffset = (resizedTileHeight - tileHeight) * curZoom
+          tileOffset = (96+resizedTileHeight - tileHeight) * curZoom
         ctx.fillStyle = 'rgba' + graphicValue
         ctx.beginPath()
         ctx.moveTo xpos, ypos + (stack - 1) * tileOffset + tileHeight * curZoom / 2
@@ -113,6 +114,7 @@ class Field
       return
 
     # Used for drawing vertical shadows on top of tiles in isometric view if switched on
+    # Используется для рисования вертикальных теней на элементе сетки в изометрическом вьюме, если вклчючена
 
     _drawVeritcalColorOverlay = (shadowXpos, shadowYpos, graphicValue, currStack, nextStack, resizedTileHeight, shadowSettings) ->
       shadowHeight = tileHeight - (shadowSettings.offset) or 1
@@ -143,11 +145,16 @@ class Field
           particleMapHolder[i][j].Draw xpos, ypos + (stack - 1) * (tileHeight - heightOffset - tileHeight) * curZoom - ((resizedTileHeight - tileHeight) * curZoom), curZoom
       return
 
+
+    #Отрисовка основного грида
     _draw = (i, j, tileImageOverwite) ->
+
       xpos = undefined
       ypos = undefined
       i = Math.round(i)
       j = Math.round(j)
+
+      #При невыполнимых условиях заканчивается сразу
       if i < 0
         return
       if j < 0
@@ -156,6 +163,8 @@ class Field
         return
       if mapLayout[i] and j > mapLayout[i].length - 1
         return
+
+      #какие-то условия
       resizedTileHeight = undefined
       stackGraphic = null
       graphicValue = if mapLayout[i] then mapLayout[i][j] else 0
@@ -163,34 +172,45 @@ class Field
       distanceLightingSettings = undefined
       k = 0
       stack = 0
+
+      #с высотой работать тут
+
       if heightMap
         stack = Math.round(Number(heightMap[i][j]))
         k = stack
+
       if shadowDistance
         distanceLightingSettings =
           distance: shadowDistance.distance
           darkness: shadowDistance.darkness
           color: shadowDistance.color
         distanceLighting = Math.sqrt(Math.round(i - lightX) * Math.round(i - lightX) + Math.round(j - lightY) * Math.round(j - lightY))
+
         if lightMap
           lightDist = 0
           lightI = undefined
           lightJ = undefined
           # Calculate which light source is closest
           light = 0
+
           while light < lightMap.length
             lightI = Math.round(i - (lightMap[light][0]))
             lightJ = Math.round(j - (lightMap[light][1]))
             lightDist = Math.sqrt(lightI * lightI + lightJ * lightJ)
+
             if distanceLighting / (distanceLightingSettings.darkness * distanceLightingSettings.distance) > lightDist / (lightMap[light][2] * lightMap[light][3])
               distanceLighting = lightDist
               distanceLightingSettings.distance = lightMap[light][2]
               distanceLightingSettings.darkness = lightMap[light][3]
             light++
+
         if distanceLighting > distanceLightingSettings.distance
           distanceLighting = distanceLightingSettings.distance
+
         distanceLighting = distanceLighting / (distanceLightingSettings.darkness * distanceLightingSettings.distance)
+
       if !zeroIsBlank or zeroIsBlank and graphicValue or tileImageOverwite
+
         if zeroIsBlank
           if Number(graphicValue) >= 0
             graphicValue--
@@ -206,25 +226,27 @@ class Field
               stackGraphic = tileImages[tileImagesDictionary[graphicValue]]
             else
               stackGraphic = undefined
+
         resizedTileHeight = 0
+
         if stackGraphic
           resizedTileHeight = stackGraphic.height / (stackGraphic.width / tileWidth)
+
         if !isometric
           xpos = i * tileHeight * curZoom + drawX
           ypos = j * tileWidth * curZoom + drawY
         else
-        #Магия
-        #Отрисовка сетки
-        #Отрисовка позиции 02.11.15
-        #отрисовка в засимисти от мышки 03.11.15
-
           xpos = (i - j) * tileHeight * curZoom + drawX
           ypos = (i + j) * tileWidth / 4 * curZoom + drawY
+
+
+
         if !stackTiles
           # If no heightmap for this tile
           if !distanceLightingSettings or distanceLightingSettings and distanceLighting < distanceLightingSettings.darkness
             if tileImageOverwite
               # Draw the overwriting image insetad of tile
+              # img_elem,dx_or_sx,dy_or_sy,dw_or_sw,dh_or_sh,dx,dy,dw,dh
               ctx.drawImage tileImageOverwite, 0, 0, stackGraphic.width, stackGraphic.height, xpos, ypos + (tileHeight - resizedTileHeight) * curZoom, tileWidth * curZoom, resizedTileHeight * curZoom
             else
               # Draw the tile image
@@ -241,57 +263,58 @@ class Field
                 # tile is an RGBA value
                 _drawHorizontalColorOverlay xpos, ypos, graphicValue, k, resizedTileHeight
               ctx.restore()
-        else
-          if heightMapOnTop
-            # If tile is to be placed on top of heightmap 
-            if !distanceLightingSettings or distanceLightingSettings and distanceLighting < distanceLightingSettings.darkness
-              if tileImageOverwite
-                # Draw overwriting image on top of height map
-                ctx.drawImage tileImageOverwite, 0, 0, tileImageOverwite.width, tileImageOverwite.height, xpos, ypos + (stack - 1) * (tileHeight - heightOffset - tileHeight) * curZoom - ((resizedTileHeight - tileHeight) * curZoom), tileWidth * curZoom, resizedTileHeight * curZoom
-              else
-                # Draw the tile image on top of height map
-                if Number(graphicValue) >= 0
-                  ctx.save()
-                  if alphaWhenFocusBehind and alphaWhenFocusBehind.apply == true
-                    if i == focusTilePosX + 1 and j == focusTilePosY + 1 or i == focusTilePosX and j == focusTilePosY + 1 or i == focusTilePosX + 1 and j == focusTilePosY
-                      if alphaWhenFocusBehind.objectApplied and (alphaWhenFocusBehind.objectApplied == null or alphaWhenFocusBehind.objectApplied and resizedTileHeight * curZoom > alphaWhenFocusBehind.objectApplied.height * curZoom)
-                        ctx.globalAlpha = 0.6
-                  ctx.drawImage stackGraphic, 0, 0, stackGraphic.width, stackGraphic.height, xpos, ypos + (stack - 1) * (tileHeight - heightOffset - tileHeight) * curZoom - ((resizedTileHeight - tileHeight) * curZoom), tileWidth * curZoom, resizedTileHeight * curZoom
-                  ctx.restore()
-                else if graphicValue != -1
-                  _drawHorizontalColorOverlay xpos, ypos, graphicValue, stack, resizedTileHeight
-          else
-            # If tile is to be repeated for heightmap
-            k = 0
-            while k <= stack
-              if !distanceLightingSettings or distanceLightingSettings and distanceLighting < distanceLightingSettings.darkness
-                if tileImageOverwite
-                  # If there is an overwrite image
-                  ctx.drawImage tileImageOverwite, 0, 0, tileImageOverwite.width, tileImageOverwite.height, xpos, ypos + k * (tileHeight - heightOffset - resizedTileHeight) * curZoom, tileWidth * curZoom, resizedTileHeight * curZoom
-                else
-                  if stackTileGraphic
-                    if k != stack
-                      # Repeat tile graphic till it's reach heightmap max
-                      if stackGraphic
-                        ctx.drawImage stackGraphic, 0, 0, stackGraphic.width, stackGraphic.height, xpos, ypos + k * (tileHeight - heightOffset - resizedTileHeight) * curZoom, tileWidth * curZoom, resizedTileHeight * curZoom
-                    else
-                      if Number(graphicValue) >= 0
-                        # reset stackGraphic
-                        stackGraphic = tileImages[tileImagesDictionary[graphicValue]]
-                        ctx.drawImage stackGraphic, 0, 0, stackGraphic.width, stackGraphic.height, xpos, ypos + (k - 1) * (tileHeight - heightOffset - resizedTileHeight) * curZoom, tileWidth * curZoom, stackGraphic.height / (stackGraphic.width / tileWidth) * curZoom
-                      else if graphicValue != -1
-                        _drawHorizontalColorOverlay xpos, ypos, graphicValue, k, resizedTileHeight
-                  else
-                    # No stack graphic specified so draw tile at top
-                    if k == stack
-                      if Number(graphicValue) >= 0
-                        ctx.drawImage stackGraphic, 0, 0, stackGraphic.width, stackGraphic.height, xpos, ypos + k * (tileHeight - heightOffset - resizedTileHeight) * curZoom, tileWidth * curZoom, resizedTileHeight * curZoom
-                      else if graphicValue != -1
-                        _drawHorizontalColorOverlay xpos, ypos, graphicValue, stack, resizedTileHeight
-                    else
-                      ctx.drawImage stackGraphic, 0, 0, stackGraphic.width, stackGraphic.height, xpos, ypos + k * (tileHeight - heightOffset - resizedTileHeight) * curZoom, tileWidth * curZoom, resizedTileHeight * curZoom
-              k++
-            ctx.restore()
+#        else
+#          if heightMapOnTop
+#            # If tile is to be placed on top of heightmap
+#            if !distanceLightingSettings or distanceLightingSettings and distanceLighting < distanceLightingSettings.darkness
+#              if tileImageOverwite
+#                # Draw overwriting image on top of height map
+#                ctx.drawImage tileImageOverwite, 0, 0, tileImageOverwite.width, tileImageOverwite.height, xpos, ypos + (stack - 1) * (tileHeight - heightOffset - tileHeight) * curZoom - ((resizedTileHeight - tileHeight) * curZoom), tileWidth * curZoom, resizedTileHeight * curZoom
+#              else
+#                # Draw the tile image on top of height map
+#                if Number(graphicValue) >= 0
+#                  ctx.save()
+#                  if alphaWhenFocusBehind and alphaWhenFocusBehind.apply == true
+#                    if i == focusTilePosX + 1 and j == focusTilePosY + 1 or i == focusTilePosX and j == focusTilePosY + 1 or i == focusTilePosX + 1 and j == focusTilePosY
+#                      if alphaWhenFocusBehind.objectApplied and (alphaWhenFocusBehind.objectApplied == null or alphaWhenFocusBehind.objectApplied and resizedTileHeight * curZoom > alphaWhenFocusBehind.objectApplied.height * curZoom)
+#                        ctx.globalAlpha = 0.6
+#                  ctx.drawImage stackGraphic, 0, 0, stackGraphic.width, stackGraphic.height, xpos, ypos + (stack - 1) * (tileHeight - heightOffset - tileHeight) * curZoom - ((resizedTileHeight - tileHeight) * curZoom), tileWidth * curZoom, resizedTileHeight * curZoom
+#                  ctx.restore()
+#                else if graphicValue != -1
+#                  _drawHorizontalColorOverlay xpos, ypos, graphicValue, stack, resizedTileHeight
+#          else
+#            # If tile is to be repeated for heightmap
+#            k = 0
+#            while k <= stack
+#              if !distanceLightingSettings or distanceLightingSettings and distanceLighting < distanceLightingSettings.darkness
+#                if tileImageOverwite
+#                  # If there is an overwrite image
+#                  ctx.drawImage tileImageOverwite, 0, 0, tileImageOverwite.width, tileImageOverwite.height, xpos, ypos + k * (tileHeight - heightOffset - resizedTileHeight) * curZoom, tileWidth * curZoom, resizedTileHeight * curZoom
+#                else
+#                  if stackTileGraphic
+#                    if k != stack
+#                      # Repeat tile graphic till it's reach heightmap max
+#                      if stackGraphic
+#                        ctx.drawImage stackGraphic, 0, 0, stackGraphic.width, stackGraphic.height, xpos, ypos + k * (tileHeight - heightOffset - resizedTileHeight) * curZoom, tileWidth * curZoom, resizedTileHeight * curZoom
+#                    else
+#                      if Number(graphicValue) >= 0
+#                        # reset stackGraphic
+#                        stackGraphic = tileImages[tileImagesDictionary[graphicValue]]
+#                        ctx.drawImage stackGraphic, 0, 0, stackGraphic.width, stackGraphic.height, xpos, ypos + (k - 1) * (tileHeight - heightOffset - resizedTileHeight) * curZoom, tileWidth * curZoom, stackGraphic.height / (stackGraphic.width / tileWidth) * curZoom
+#                      else if graphicValue != -1
+#                        _drawHorizontalColorOverlay xpos, ypos, graphicValue, k, resizedTileHeight
+#                  else
+#                    # No stack graphic specified so draw tile at top
+#                    if k == stack
+#                      if Number(graphicValue) >= 0
+#                        ctx.drawImage stackGraphic, 0, 0, stackGraphic.width, stackGraphic.height, xpos, ypos + k * (tileHeight - heightOffset - resizedTileHeight) * curZoom, tileWidth * curZoom, resizedTileHeight * curZoom
+#                      else if graphicValue != -1
+#                        _drawHorizontalColorOverlay xpos, ypos, graphicValue, stack, resizedTileHeight
+#                    else
+#                      ctx.drawImage stackGraphic, 0, 0, stackGraphic.width, stackGraphic.height, xpos, ypos + k * (tileHeight - heightOffset - resizedTileHeight) * curZoom, tileWidth * curZoom, resizedTileHeight * curZoom
+#              k++
+#            ctx.restore()
+
       if heightShadows
         nextStack = 0
         currStack = 0
@@ -328,19 +351,20 @@ class Field
       if mouseUsed and applyInteractions
         if i == focusTilePosX and j == focusTilePosY
           # Apply mouse over tile coloring
-          _drawHorizontalColorOverlay xpos, ypos, '(255, 255, 120, 0.7)', k - 1, resizedTileHeight
+          _drawHorizontalColorOverlay xpos, ypos, '(255, 255, 120, 0.4)', k - 1, resizedTileHeight
       if particleTiles
         # Draw Particles
         _drawParticles xpos, ypos, i, j, k, distanceLighting, distanceLightingSettings, resizedTileHeight
       return
 
-    _stackTiles = (settings) ->
-      stackTiles = true
-      if settings.heightTile
-        stackTileGraphic = settings.heightTile
-      heightMap = settings.map
-      heightOffset = settings.offset
-      heightMapOnTop = settings.heightMapOnTop or false
+    _stackTiles = (heightTile) ->
+#      stackTiles = true
+#      if settings.heightTile
+#      stackTileGraphic = settings.heightTile
+#      heightMap = settings.map
+      heightOffset = heightTile
+      console.log(heightOffset)
+#      heightMapOnTop = settings.heightMapOnTop or false
       return
 
     _particleTiles = (map) ->
@@ -556,8 +580,8 @@ class Field
       draw: (tileX, tileY, tileImageOverwite) ->
         _draw tileX, tileY, tileImageOverwite
 
-      stackTiles: (settings) ->
-        _stackTiles settings
+      stackTiles: (heightTile) ->
+        _stackTiles heightTile
 
       particleTiles: (map) ->
         _particleTiles map
@@ -666,7 +690,7 @@ class Field
         particle = undefined
         subPart = undefined
         distance = distance or tileHeight
-        console.log(curZoom)
+#        console.log(curZoom)
         #smotret' tut
         if isometric
           if direction == 'up'

@@ -107,4 +107,4 @@ class Utils
         textLines
     }
 
-console.log(new Utils())
+#console.log(new Utils())
