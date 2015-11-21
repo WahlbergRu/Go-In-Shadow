@@ -20,9 +20,10 @@ init = (TileField) ->
         game.init [ {
           Title: 'Graphics'
           layout: jsonResponse[0][0]
+          layoutHeight: jsonResponse[0].length
           graphics: imgResponse[0].files
           graphicsDictionary: imgResponse[0].dictionary
-          heightTile: 128
+          heightTile: 96
           tileHeight: gameScheme.tileHeight
           tileWidth: gameScheme.tileWidth
           zeroIsBlank: true
@@ -77,7 +78,7 @@ init = (TileField) ->
 
     input.mouse_action (coords) ->
       mapLayers.map (layer) ->
-        #                                console.log(layer.getHeightMapTile());
+        # console.log(layer.getHeightMapTile());
         tile_coordinates = layer.applyMouseFocus(coords.x, coords.y)
         # Get the current mouse location from X & Y Coords
         # console.log coords
