@@ -99,9 +99,19 @@ init = (TileField) ->
 
     input.keyboard (keyCode, pressed, e) ->
       #Светить в консоли кейкод
-#      console.log keyCode
+      console.log keyCode
       switch keyCode
-        when 74
+        when 77
+          #m - на уровень вниз
+          mapLayers.map (layer) ->
+            layer.layoutLevelChange 'down'
+          return
+        when 78
+          #n - на уровень вверх
+          mapLayers.map (layer) ->
+            layer.layoutLevelChange 'up'
+          return
+        when 72
           #j - отдалить
           mapLayers.map (layer) ->
             console.log();
@@ -112,10 +122,9 @@ init = (TileField) ->
               rangeX += 1
               rangeY += 1
             return
-        when 75
+        when 74
           #k - приблизить
           console.log();
-
           mapLayers.map (layer) ->
             if rangeY - 1 > defaultRangeY - 1
               layer.setZoom 'in'

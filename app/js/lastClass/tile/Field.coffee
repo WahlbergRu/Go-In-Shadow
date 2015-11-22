@@ -7,7 +7,7 @@ class Field
     utils = new Utils()
     emitter = new Emitter()
     effectLoader = new EffectLoader()
-
+    globalI = 0
     title = ''
     zeroIsBlank = false
     stackTiles = false
@@ -18,6 +18,7 @@ class Field
     tileWidth = 0
     heightMap = null
     layoutHeight = null
+    layoutLevel = 0
     lightMap = null
     lightX = null
     lightY = null
@@ -212,11 +213,13 @@ class Field
 
         distanceLighting = distanceLighting / (distanceLightingSettings.darkness * distanceLightingSettings.distance)
 
-      if !zeroIsBlank or zeroIsBlank and graphicValue
+      if graphicValue
+
 
         if zeroIsBlank
           if Number(graphicValue) >= 0
             graphicValue--
+
         if tilesHide and graphicValue >= hideSettings.hideStart and graphicValue <= hideSettings.hideEnd
           stackGraphic = tileImages[hideSettings.planeGraphic]
         else
@@ -250,27 +253,37 @@ class Field
 #              if i == focusTilePosX + 1 and j == focusTilePosY + 1 or i == focusTilePosX and j == focusTilePosY + 1 or i == focusTilePosX + 1 and j == focusTilePosY
 #                if alphaWhenFocusBehind.objectApplied and (alphaWhenFocusBehind.objectApplied == null or alphaWhenFocusBehind.objectApplied and resizedTileHeight * curZoom > alphaWhenFocusBehind.objectApplied.height * curZoom)
 #                  ctx.globalAlpha = 0.6
-          stack = layoutHeight
-          while (stack>0)
-            if Number(graphicValue) >= 0
-              # tile has a graphic ID
-              # img_elem,dx_or_sx,dy_or_sy,dw_or_sw,dh_or_sh,dx,dy,dw,dh
-              if stackGraphic != undefined
-                img_elem = stackGraphic
-                sx = 0
-                sy = 0
-                sw = stackGraphic.width
-                sh = stackGraphic.height
-                dx = xpos
-                dy = ypos + (stack * heightOffset - (resizedTileHeight - tileHeight)) * curZoom
-                dw = tileWidth * curZoom
-                dh = resizedTileHeight * curZoom
-                ctx.drawImage img_elem, sx, sy, sw, sh, dx, dy, dw, dh
-            else if graphicValue != -1
-              # tile is an RGBA value
-              _drawHorizontalColorOverlay xpos, ypos, graphicValue, k, resizedTileHeight
-            stack--
-          ctx.restore()
+#          stack = layoutHeight
+          # TODO: сделать отрисовку в зависимости от высоты
+          # TODO: сделать отрисовку разных уровней
+          # TODO: сделать отрисовку в зависимости от уровня.
+
+          # layoutLevel - подставить для смены уровня
+#          console.log(layoutLevel)
+
+          if Number(graphicValue) >= 0
+            # tile has a graphic ID
+            # img_elem,dx_or_sx,dy_or_sy,dw_or_sw,dh_or_sh,dx,dy,dw,dh
+            if stackGraphic != undefined
+              if globalI<10
+                console.log(stackGraphic)
+                console.log(zeroIsBlank)
+                globalI++
+              img_elem = stackGraphic
+              sx = 0
+              sy = 0
+              sw = stackGraphic.width
+              sh = stackGraphic.height
+              dx = xpos
+              dy = ypos + ((stack+1) * heightOffset - (resizedTileHeight - tileHeight)) * curZoom
+              dw = tileWidth * curZoom
+              dh = resizedTileHeight * curZoom
+              ctx.drawImage img_elem, sx, sy, sw, sh, dx, dy, dw, dh
+          else if graphicValue != -1
+            # tile is an RGBA value
+            _drawHorizontalColorOverlay xpos, ypos, graphicValue, k, resizedTileHeight
+
+        ctx.restore()
 #        else
 #          if heightMapOnTop
 #            # If tile is to be placed on top of heightmap
@@ -433,6 +446,12 @@ class Field
         else
           curZoom = 0.1
       return
+
+    _layoutLevelChange = (direction) ->
+      if direction == 'up'
+        layoutLevel = layoutLevel++
+      else if direction == 'down'
+        layoutLevel = layoutLevel--
 
     _adjustLight = (setting, increase) ->
       if increase
@@ -621,6 +640,10 @@ class Field
       setZoom: (direction) ->
         # in || out
         _setZoom direction
+
+      layoutLevelChange: (direction) ->
+        # up || down
+        _layoutLevelChange direction
 
       setLight: (tileX, tileY) ->
         _setLight tileX, tileY
