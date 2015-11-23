@@ -18,7 +18,7 @@ class Field
     tileWidth = 0
     heightMap = null
     layoutHeight = null
-    layoutLevel = 0
+    layoutLevel = null
     lightMap = null
     lightX = null
     lightY = null
@@ -50,12 +50,13 @@ class Field
       lightMap = settings.lightMap
       shadowDistance = settings.shadowDistance
       title = settings.title
+      layoutLevel = settings.layoutLevel
       zeroIsBlank = settings.zeroIsBlank
       applyInteractions = settings.applyInteractions
       if settings.particleMap
         _particleTiles settings.particleMap
       if settings.layout
-        mapLayout = settings.layout
+        mapLayout = settings.layout[layoutLevel]
       if settings.layoutHeight
         layoutHeight = settings.layoutHeight
       if settings.graphics
@@ -71,6 +72,10 @@ class Field
         _stackTiles settings.heightTile
       if settings.particleEffects
         particleEffects = settings.particleEffects
+
+
+      #переместить это в draw
+
       if settings.width
         row = []
         col = 0
@@ -257,7 +262,7 @@ class Field
           # TODO: сделать отрисовку в зависимости от высоты
           # TODO: сделать отрисовку разных уровней
           # TODO: сделать отрисовку в зависимости от уровня.
-
+          # tileImages - тайлы из imageFiles
           # layoutLevel - подставить для смены уровня
 #          console.log(layoutLevel)
 
@@ -267,7 +272,6 @@ class Field
             if stackGraphic != undefined
               if globalI<10
                 console.log(stackGraphic)
-                console.log(zeroIsBlank)
                 globalI++
               img_elem = stackGraphic
               sx = 0
@@ -449,9 +453,12 @@ class Field
 
     _layoutLevelChange = (direction) ->
       if direction == 'up'
-        layoutLevel = layoutLevel++
+        layoutLevel++
       else if direction == 'down'
-        layoutLevel = layoutLevel--
+        layoutLevel--
+
+    _setLayoutLevel = (level) ->
+      layoutLevel = level
 
     _adjustLight = (setting, increase) ->
       if increase
@@ -640,6 +647,9 @@ class Field
       setZoom: (direction) ->
         # in || out
         _setZoom direction
+
+      setLayoutLevel: (level) ->
+        _setLayoutLevel level
 
       layoutLevelChange: (direction) ->
         # up || down

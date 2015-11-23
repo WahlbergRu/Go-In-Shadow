@@ -16,10 +16,11 @@ init = (TileField) ->
 #           heightTile: imgResponse[0].files['ground.png']
 
         # X & Y drawing position, and tile span to draw - малая карта
+        # поменять лаяут на меньшую размерность, и работать отсюда далее 22.11.15 14:34
 
         game.init [ {
           Title: 'Graphics'
-          layout: jsonResponse[0][0]
+          layout: jsonResponse[0]
           layoutHeight: jsonResponse[0].length
           graphics: imgResponse[0].files
           graphicsDictionary: imgResponse[0].dictionary
@@ -27,7 +28,8 @@ init = (TileField) ->
           tileHeight: gameScheme.tileHeight
           tileWidth: gameScheme.tileWidth
           zeroIsBlank: true
-        } ]
+          layoutLevel: 0
+        }]
 
         addTilesToHUD 'Graphics', imgResponse[0].dictionary, 1
 
