@@ -56,7 +56,7 @@ class Field
       if settings.particleMap
         _particleTiles settings.particleMap
       if settings.layout
-        mapLayout = settings.layout[layoutLevel]
+        mapLayout = settings.layout
       if settings.layoutHeight
         layoutHeight = settings.layoutHeight
       if settings.graphics
@@ -73,24 +73,22 @@ class Field
       if settings.particleEffects
         particleEffects = settings.particleEffects
 
-
-      #переместить это в draw
-
-      if settings.width
-        row = []
-        col = 0
-        mapLayout = []
-        i = 0
-        while i < settings.layout.length
-          col++
-          if col != settings.width
-            row.push settings.layout[i]
-          else
-            row.push settings.layout[i]
-            mapLayout.push row
-            row = []
-            col = 0
-          i++
+#
+#      if settings.width
+#        row = []
+#        col = 0
+#        mapLayout = []
+#        i = 0
+#        while i < settings.layout.length
+#          col++
+#          if col != settings.width
+#            row.push settings.layout[i]
+#          else
+#            row.push settings.layout[i]
+#            mapLayout.push row
+#            row = []
+#            col = 0
+#          i++
       alphaWhenFocusBehind = settings.alphaWhenFocusBehind
       return
 
@@ -168,15 +166,15 @@ class Field
         return
       if j < 0
         return
-      if i > mapLayout.length - 1
+      if i > mapLayout[layoutLevel].length - 1
         return
-      if mapLayout[i] and j > mapLayout[i].length - 1
+      if mapLayout[layoutLevel][i] and j > mapLayout[layoutLevel][i].length - 1
         return
 
       #какие-то условия
       resizedTileHeight = undefined
       stackGraphic = null
-      graphicValue = if mapLayout[i] then mapLayout[i][j] else 0
+      graphicValue = if mapLayout[layoutLevel][i] then mapLayout[layoutLevel][i][j] else 0
       distanceLighting = null
       distanceLightingSettings = undefined
       k = 0
@@ -254,24 +252,24 @@ class Field
         if !distanceLightingSettings or distanceLightingSettings and distanceLighting < distanceLightingSettings.darkness
           # Draw the tile image
           ctx.save()
-#            if alphaWhenFocusBehind and alphaWhenFocusBehind.apply == true
-#              if i == focusTilePosX + 1 and j == focusTilePosY + 1 or i == focusTilePosX and j == focusTilePosY + 1 or i == focusTilePosX + 1 and j == focusTilePosY
-#                if alphaWhenFocusBehind.objectApplied and (alphaWhenFocusBehind.objectApplied == null or alphaWhenFocusBehind.objectApplied and resizedTileHeight * curZoom > alphaWhenFocusBehind.objectApplied.height * curZoom)
-#                  ctx.globalAlpha = 0.6
-#          stack = layoutHeight
+          #            if alphaWhenFocusBehind and alphaWhenFocusBehind.apply == true
+          #              if i == focusTilePosX + 1 and j == focusTilePosY + 1 or i == focusTilePosX and j == focusTilePosY + 1 or i == focusTilePosX + 1 and j == focusTilePosY
+          #                if alphaWhenFocusBehind.objectApplied and (alphaWhenFocusBehind.objectApplied == null or alphaWhenFocusBehind.objectApplied and resizedTileHeight * curZoom > alphaWhenFocusBehind.objectApplied.height * curZoom)
+          #                  ctx.globalAlpha = 0.6
+          #          stack = layoutHeight
           # TODO: сделать отрисовку в зависимости от высоты
           # TODO: сделать отрисовку разных уровней
           # TODO: сделать отрисовку в зависимости от уровня.
           # tileImages - тайлы из imageFiles
           # layoutLevel - подставить для смены уровня
-#          console.log(layoutLevel)
+          # console.log(layoutLevel)
 
           if Number(graphicValue) >= 0
             # tile has a graphic ID
             # img_elem,dx_or_sx,dy_or_sy,dw_or_sw,dh_or_sh,dx,dy,dw,dh
             if stackGraphic != undefined
               if globalI<10
-                console.log(stackGraphic)
+                console.log(mapLayout);
                 globalI++
               img_elem = stackGraphic
               sx = 0

@@ -93,8 +93,6 @@ init = (TileField) ->
     input.mouse_move (coords) ->
       mapLayers.map (layer) ->
         tile_coordinates = layer.applyMouseFocus coords.x, coords.y
-
-
         # Apply mouse rollover via mouse location X & Y
         return
       return
@@ -105,14 +103,16 @@ init = (TileField) ->
       switch keyCode
         when 77
           #m - на уровень вниз
-          mapLayers.map (layer) ->
-            layer.layoutLevelChange 'down'
-          return
+          if pressed
+            mapLayers.map (layer) ->
+              layer.layoutLevelChange 'down'
+            return
         when 78
           #n - на уровень вверх
-          mapLayers.map (layer) ->
-            layer.layoutLevelChange 'up'
-          return
+          if pressed
+            mapLayers.map (layer) ->
+              layer.layoutLevelChange 'up'
+            return
         when 72
           #j - отдалить
           mapLayers.map (layer) ->
