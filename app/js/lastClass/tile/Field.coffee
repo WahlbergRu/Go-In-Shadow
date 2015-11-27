@@ -73,22 +73,22 @@ class Field
       if settings.particleEffects
         particleEffects = settings.particleEffects
 
-#
-#      if settings.width
-#        row = []
-#        col = 0
-#        mapLayout = []
-#        i = 0
-#        while i < settings.layout.length
-#          col++
-#          if col != settings.width
-#            row.push settings.layout[i]
-#          else
-#            row.push settings.layout[i]
-#            mapLayout.push row
-#            row = []
-#            col = 0
-#          i++
+
+      if settings.width
+        row = []
+        col = 0
+        mapLayout = []
+        i = 0
+        while i < settings.layout.length
+          col++
+          if col != settings.width
+            row.push settings.layout[i]
+          else
+            row.push settings.layout[i]
+            mapLayout.push row
+            row = []
+            col = 0
+          i++
       alphaWhenFocusBehind = settings.alphaWhenFocusBehind
       return
 
@@ -518,9 +518,9 @@ class Field
       }
 
     _setTile = (x, y, val) ->
-      if !mapLayout[x]
-        mapLayout[x] = []
-      mapLayout[x][y] = val
+      if !mapLayout[layoutLevel][x]
+        mapLayout[layoutLevel][x] = []
+      mapLayout[layoutLevel][x][y] = val
       return
 
     _setHeightmapTile = (x, y, val) ->
@@ -651,7 +651,10 @@ class Field
 
       layoutLevelChange: (direction) ->
         # up || down
-        _layoutLevelChange direction
+        if (layoutLevel < layoutHeight && direction == 'up')
+          _layoutLevelChange direction
+        else if (layoutLevel > 0 && direction == 'down')
+          _layoutLevelChange direction
 
       setLight: (tileX, tileY) ->
         _setLight tileX, tileY
