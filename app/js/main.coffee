@@ -9,7 +9,7 @@ init = (TileField) ->
     ]).then (jsonResponse) ->
       new ImgLoader([{ graphics: jsonResponse[1].images }]).then (imgResponse) ->
         #TODO: 20, 20 - эти цифры должны заменится размером раб. области (экран, тач)
-        game = new main(0, 0, 20, 20)
+        game = new main(0, 0, 40, 20)
 #         heightMap:
 #           map: jsonResponse[0].height
 #           offset: 0
@@ -29,6 +29,12 @@ init = (TileField) ->
           tileWidth: gameScheme.tileWidth
           zeroIsBlank: true
           layoutLevel: 0
+          applyInteractions: true
+          shadow: {
+            offset: 128
+            verticalColor: '(5, 5, 30, 0.4)'
+            horizontalColor: '(6, 5, 50, 0.5)'
+          }
         }]
 
         addTilesToHUD 'Graphics', imgResponse[0].dictionary, 1
@@ -63,7 +69,7 @@ init = (TileField) ->
     rangeX = xrange
     rangeY = yrange
     defaultRangeY = rangeY
-
+    layoutLevelObj = document.getElementById('layoutLevel')
     control = new Control()
     CanvasControl = control.getCanvas()
 
@@ -80,10 +86,7 @@ init = (TileField) ->
 
     input.mouse_action (coords) ->
       mapLayers.map (layer) ->
-        # console.log(layer.getHeightMapTile());
         tile_coordinates = layer.applyMouseFocus(coords.x, coords.y)
-        # Get the current mouse location from X & Y Coords
-        # console.log coords
         # layer.setHeightmapTile(tile_coordinates.x, tile_coordinates.y, layer.getHeightMapTile(tile_coordinates.x, tile_coordinates.y) + 1); // Increase heightmap tile
         layer.setTile tile_coordinates.x, tile_coordinates.y, tileSelection.value
         # Force the chaning of tile graphic
@@ -92,26 +95,30 @@ init = (TileField) ->
 
     input.mouse_move (coords) ->
       mapLayers.map (layer) ->
-        tile_coordinates = layer.applyMouseFocus coords.x, coords.y
+        tile_coordinates = layer.applyMouseFocus(coords.x, coords.y)
+
         # Apply mouse rollover via mouse location X & Y
         return
       return
+
 
     input.keyboard (keyCode, pressed, e) ->
       #Светить в консоли кейкод
       console.log keyCode
       switch keyCode
         when 77
-          #m - на уровень вниз
-          if pressed
-            mapLayers.map (layer) ->
-              layer.layoutLevelChange 'down'
-            return
-        when 78
-          #n - на уровень вверх
+          #m - на уровень вверх
           if pressed
             mapLayers.map (layer) ->
               layer.layoutLevelChange 'up'
+              layoutLevelObj.innerHTML = layer.getLayoutLevel();
+            return
+        when 78
+          #n - на уровень вниз
+          if pressed
+            mapLayers.map (layer) ->
+              layer.layoutLevelChange 'down'
+              layoutLevelObj.innerHTML = layer.getLayoutLevel();
             return
         when 72
           #j - отдалить
@@ -225,9 +232,7 @@ init = (TileField) ->
     return {
       init: (layers) ->
         i = 0
-#        console.log(layers)
         while i < 0 + layers.length
-#          console.log(layers[i])
           mapLayers[i] = new Field(context, CanvasControl().height, CanvasControl().width)
           mapLayers[i].setup layers[i]
           mapLayers[i].align 'h-center', CanvasControl().width, xrange + startX, 0
@@ -237,6 +242,9 @@ init = (TileField) ->
 #        console.log(mapLayers);
         draw()
     }
+
+
+  ##TODO переписать вот эту часть на колбеки, вместо фпса.
 
   window.requestAnimFrame = do ->
     window.requestAnimationFrame or window.webkitRequestAnimationFrame or window.mozRequestAnimationFrame or window.oRequestAnimationFrame or window.msRequestAnimationFrame or (callback, element) ->

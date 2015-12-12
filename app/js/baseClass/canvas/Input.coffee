@@ -10,7 +10,7 @@ for canvas interaction
 class Input
   constructor: (doc, canvas) ->
     _keyboardInput = (e, callback, pressed) ->
-      console.log e
+#      console.log e
       keyCode = undefined
       if e == null
         keyCode = window.e.keyCode
