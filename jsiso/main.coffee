@@ -1,44 +1,40 @@
-init = (TileField) ->
-# -- FPS --------------------------------
-#  input = new Input(document, CanvasControl)
+require [
+  'jsiso/canvas/Control'
+  'jsiso/canvas/Input'
+  'jsiso/img/load'
+  'jsiso/json/load'
+  'jsiso/tile/Field'
+  'jsiso/pathfind/pathfind'
+  'jsiso/particles/EffectLoader'
+  'jsiso/utils'
+  'requirejs/domReady!'
+], (CanvasControl, CanvasInput, imgLoader, jsonLoader, TileField, pathfind, EffectLoader, utils) ->
+  # -- FPS --------------------------------
   #TODO: сделать дравинг в зависимости от размера экрана
+
   launch = ->
-    new JsonLoader([
+    jsonLoader([
       gameScheme.map
       gameScheme.imageFiles
     ]).then (jsonResponse) ->
-      new ImgLoader([{ graphics: jsonResponse[1].images }]).then (imgResponse) ->
-        #TODO: 20, 20 - эти цифры должны заменится размером раб. области (экран, тач)
-        game = new main(0, 0, 40, 20)
-#         heightMap:
-#           map: jsonResponse[0].height
-#           offset: 0
-#           heightTile: imgResponse[0].files['ground.png']
-
+      imgLoader([ { graphics: jsonResponse[1].images } ]).then (imgResponse) ->
+        game = new main(0, 0, 20, 20)
         # X & Y drawing position, and tile span to draw - малая карта
-        # поменять лаяут на меньшую размерность, и работать отсюда далее 22.11.15 14:34
-
+        # var game = new main(45, 45, 45, 45);// X & Y drawing position, and tile span to draw - большая карта
         game.init [ {
           Title: 'Graphics'
-          layout: jsonResponse[0]
-          layoutHeight: jsonResponse[0].length
+          layout: jsonResponse[0].ground
           graphics: imgResponse[0].files
           graphicsDictionary: imgResponse[0].dictionary
-          heightTile: 64
+          heightMap:
+            map: jsonResponse[0].height
+            offset: -80
+            heightTile: imgResponse[0].files['ground.png']
           tileHeight: gameScheme.tileHeight
           tileWidth: gameScheme.tileWidth
           zeroIsBlank: true
-          layoutLevel: 0
-          applyInteractions: true
-          shadow: {
-            offset: 128
-            verticalColor: '(5, 5, 30, 0.4)'
-            horizontalColor: '(6, 5, 50, 0.5)'
-          }
-        }]
-
+        } ]
         addTilesToHUD 'Graphics', imgResponse[0].dictionary, 1
-
         return
       return
     return
@@ -53,8 +49,9 @@ init = (TileField) ->
   addTilesToHUD = (layer, dictionary, offset) ->
     clickTile = undefined
     dictionary.forEach (tile, i) ->
+      `var clickTile`
       clickTile = document.createElement('a')
-      clickTile.innerHTML += '<img  height=\'50\' width=\'50\' src=\'../../assets/img/Grass/' + tile + '\' />'
+      clickTile.innerHTML += '<img  height=\'50\' width=\'50\' src=\'../img/Grass/' + tile + '\' />'
       document.getElementById('gameInfo').appendChild clickTile
       clickTile.addEventListener 'click', (e) ->
         tileChoice layer, i + offset
@@ -69,76 +66,66 @@ init = (TileField) ->
     rangeX = xrange
     rangeY = yrange
     defaultRangeY = rangeY
-    layoutLevelObj = document.getElementById('layoutLevel')
-    control = new Control()
-    CanvasControl = control.getCanvas()
-
-
     context = CanvasControl.create('canavas', 920, 600,
       background: '#000022'
       display: 'block'
       marginLeft: 'auto'
       marginRight: 'auto')
 
+    draw = ->
+      context.clearRect 0, 0, CanvasControl().width, CanvasControl().height
+      i = startY
+      while i < startY + rangeY
+        j = startX
+        while j < startX + rangeX
+          mapLayers.map (layer) ->
+            layer.draw i, j
+            return
+          j++
+        i++
+      requestAnimFrame draw
+      return
+
     CanvasControl.fullScreen()
-
-    input =  new Input(document, CanvasControl())
-
+    input = new CanvasInput(document, CanvasControl())
     input.mouse_action (coords) ->
       mapLayers.map (layer) ->
+        #                                console.log(layer.getHeightMapTile());
         tile_coordinates = layer.applyMouseFocus(coords.x, coords.y)
-        # layer.setHeightmapTile(tile_coordinates.x, tile_coordinates.y, layer.getHeightMapTile(tile_coordinates.x, tile_coordinates.y) + 1); // Increase heightmap tile
+        # Get the current mouse location from X & Y Coords
+        console.log coords
+        #layer.setHeightmapTile(tile_coordinates.x, tile_coordinates.y, layer.getHeightMapTile(tile_coordinates.x, tile_coordinates.y) + 1); // Increase heightmap tile
         layer.setTile tile_coordinates.x, tile_coordinates.y, tileSelection.value
         # Force the chaning of tile graphic
         return
       return
-
     input.mouse_move (coords) ->
       mapLayers.map (layer) ->
         tile_coordinates = layer.applyMouseFocus(coords.x, coords.y)
-
         # Apply mouse rollover via mouse location X & Y
         return
       return
-
-
     input.keyboard (keyCode, pressed, e) ->
       #Светить в консоли кейкод
       console.log keyCode
       switch keyCode
-        when 77
-          #m - на уровень вверх
-          if pressed
-            mapLayers.map (layer) ->
-              layer.layoutLevelChange 'up'
-              layoutLevelObj.innerHTML = layer.getLayoutLevel();
-            return
-        when 78
-          #n - на уровень вниз
-          if pressed
-            mapLayers.map (layer) ->
-              layer.layoutLevelChange 'down'
-              layoutLevelObj.innerHTML = layer.getLayoutLevel();
-            return
-        when 72
-          #j - отдалить
+        when 65
+          #a - отдалить
           mapLayers.map (layer) ->
-            console.log();
-            if rangeY + 1 < 25
+            if startY + rangeY + 1 < mapLayers[0].getLayout().length
               layer.setZoom 'out'
-              layer.align 'h-center', CanvasControl().width, xrange, -0
-              layer.align 'v-center', CanvasControl().height, yrange, 0
+              layer.align 'h-center', CanvasControl().width, xrange, -60
+              layer.align 'v-center', CanvasControl().height, yrange, 240
               rangeX += 1
               rangeY += 1
             return
-        when 74
-          #k - приблизить
-          console.log();
+        when 83
+          #s - приблизить
           mapLayers.map (layer) ->
             if rangeY - 1 > defaultRangeY - 1
               layer.setZoom 'in'
-              layer.align 'h-center', CanvasControl().width, xrange, -0
-              layer.align 'v-center', CanvasControl().height, yrange, 0
+              layer.align 'h-center', CanvasControl().width, xrange, -60
+              layer.align 'v-center', CanvasControl().height, yrange, 240
               rangeX -= 1
               rangeY -= 1
             return
@@ -214,37 +201,18 @@ init = (TileField) ->
             startX++
             startY--
       return
-
-
-    draw = ->
-      context.clearRect 0, 0, CanvasControl().width, CanvasControl().height
-      i = startY
-      while i < startY + rangeY
-        j = startX
-        while j < startX + rangeX
-          mapLayers.map (layer) ->
-            layer.draw i, j
-            return
-          j++
+    { init: (layers) ->
+      i = 0
+      while i < 0 + layers.length
+        mapLayers[i] = new TileField(context, CanvasControl().height, CanvasControl().width)
+        mapLayers[i].setup layers[i]
+        mapLayers[i].align 'h-center', CanvasControl().width, xrange + startX, 0
+        mapLayers[i].align 'v-center', CanvasControl().height, yrange + startY, yrange + startY
+        mapLayers[i].setZoom 'in'
         i++
-      requestAnimFrame draw
-
-    return {
-      init: (layers) ->
-        i = 0
-        while i < 0 + layers.length
-          mapLayers[i] = new Field(context, CanvasControl().height, CanvasControl().width)
-          mapLayers[i].setup layers[i]
-          mapLayers[i].align 'h-center', CanvasControl().width, xrange + startX, 0
-          mapLayers[i].align 'v-center', CanvasControl().height, yrange + startY, yrange + startY
-          mapLayers[i].setZoom 'in'
-          i++
-#        console.log(mapLayers);
-        draw()
-    }
-
-
-  ##TODO переписать вот эту часть на колбеки, вместо фпса.
+      draw()
+      return
+ }
 
   window.requestAnimFrame = do ->
     window.requestAnimationFrame or window.webkitRequestAnimationFrame or window.mozRequestAnimationFrame or window.oRequestAnimationFrame or window.msRequestAnimationFrame or (callback, element) ->
@@ -255,12 +223,9 @@ init = (TileField) ->
   tileSelection = {}
   # ---------------------------------------
   gameScheme = 
-    tileHeight: 64
-    tileWidth: 128
-    map: 'json/mapHeight.json'
-    imageFiles: 'json/imageFiles.json'
-
+    tileHeight: 43
+    tileWidth: 100
+    map: 'mapSmall.json'
+    imageFiles: 'imageFiles.json'
   launch()
   return
-
-init()
