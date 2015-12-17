@@ -316,9 +316,9 @@ class Field
                   _drawHorizontalColorOverlay xpos, ypos, '(255, 255, 120, 0.4)', -stack+1, resizedTileHeight
 
 
-#          else if graphicValue != -1
-#            # tile is an RGBA value
-#            _drawHorizontalColorOverlay xpos, ypos, graphicValue, k, resizedTileHeight
+          else if graphicValue != -1
+            # tile is an RGBA value
+            _drawHorizontalColorOverlay xpos, ypos, graphicValue, k, resizedTileHeight
 
 #        else
 #          if heightMapOnTop
@@ -372,39 +372,39 @@ class Field
 #            k++
           ctx.restore()
 
-#      if heightShadows
-#        nextStack = 0
-#        currStack = 0
-#        shadowXpos = 0
-#        shadowYpos = 0
-#        if heightMap
-#          nextStack = Math.round(Number(heightMap[i][j - 1]))
-#          currStack = Math.round(Number(heightMap[i][j]))
-#          if currStack < nextStack
-#            shadowXpos = (i - j) * tileHeight * curZoom + drawX
-#            shadowYpos = (i + j) * tileWidth / 4 * curZoom + drawY
-#            # Apply Horizontal shadow created from stacked tiles
-#            if shadowSettings.horizontalColor
-#              if !distanceLightingSettings or distanceLighting < distanceLightingSettings.darkness
-#                _drawHorizontalColorOverlay shadowXpos, shadowYpos, (if typeof shadowSettings.verticalColor == 'string' then shadowSettings.verticalColor else shadowSettings.verticalColor[i][j]), currStack, resizedTileHeight
-#            # Apply Vertical shadow created from stacked tiles
-#            if shadowSettings.verticalColor
-#              if !distanceLightingSettings or distanceLighting < distanceLightingSettings.darkness
-#                _drawVeritcalColorOverlay shadowXpos, shadowYpos, (if typeof shadowSettings.horizontalColor == 'string' then shadowSettings.horizontalColor else shadowSettings.horizontalColor[i][j]), currStack, nextStack, resizedTileHeight, shadowSettings
-#        else
-#          # Shadows without height map e.g. Object Shadows
-#          currStack = Math.round(Number(mapLayout[i][j - 1]))
-#          if currStack > 0
-#            shadowXpos = (i - j) * tileHeight * curZoom + drawX
-#            shadowYpos = (i + j) * tileWidth / 4 * curZoom + drawY
-#            _drawHorizontalColorOverlay shadowXpos, shadowYpos, (if typeof shadowSettings.verticalColor == 'string' then shadowSettings.verticalColor else shadowSettings.verticalColor[i][j]), k, resizedTileHeight
-#      if distanceLightingSettings
-#        if distanceLightingSettings.color != false
-#          --k
-#          if distanceLighting < distanceLightingSettings.darkness
-#            # Apply distance shadows from light source
-#            if stackGraphic != undefined or zeroIsBlank and stackGraphic != 0
-#              _drawHorizontalColorOverlay xpos, ypos, '(' + distanceLightingSettings.color + ',' + distanceLighting + ')', k, resizedTileHeight
+      if heightShadows
+        nextStack = 0
+        currStack = 0
+        shadowXpos = 0
+        shadowYpos = 0
+        if heightMap
+          nextStack = Math.round(Number(heightMap[i][j - 1]))
+          currStack = Math.round(Number(heightMap[i][j]))
+          if currStack < nextStack
+            shadowXpos = (i - j) * tileHeight * curZoom + drawX
+            shadowYpos = (i + j) * tileWidth / 4 * curZoom + drawY
+            # Apply Horizontal shadow created from stacked tiles
+            if shadowSettings.horizontalColor
+              if !distanceLightingSettings or distanceLighting < distanceLightingSettings.darkness
+                _drawHorizontalColorOverlay shadowXpos, shadowYpos, (if typeof shadowSettings.verticalColor == 'string' then shadowSettings.verticalColor else shadowSettings.verticalColor[i][j]), currStack, resizedTileHeight
+            # Apply Vertical shadow created from stacked tiles
+            if shadowSettings.verticalColor
+              if !distanceLightingSettings or distanceLighting < distanceLightingSettings.darkness
+                _drawVeritcalColorOverlay shadowXpos, shadowYpos, (if typeof shadowSettings.horizontalColor == 'string' then shadowSettings.horizontalColor else shadowSettings.horizontalColor[i][j]), currStack, nextStack, resizedTileHeight, shadowSettings
+        else
+          # Shadows without height map e.g. Object Shadows
+          currStack = Math.round(Number(mapLayout[i][j - 1]))
+          if currStack > 0
+            shadowXpos = (i - j) * tileHeight * curZoom + drawX
+            shadowYpos = (i + j) * tileWidth / 4 * curZoom + drawY
+            _drawHorizontalColorOverlay shadowXpos, shadowYpos, (if typeof shadowSettings.verticalColor == 'string' then shadowSettings.verticalColor else shadowSettings.verticalColor[i][j]), k, resizedTileHeight
+      if distanceLightingSettings
+        if distanceLightingSettings.color != false
+          --k
+          if distanceLighting < distanceLightingSettings.darkness
+            # Apply distance shadows from light source
+            if stackGraphic != undefined or zeroIsBlank and stackGraphic != 0
+              _drawHorizontalColorOverlay xpos, ypos, '(' + distanceLightingSettings.color + ',' + distanceLighting + ')', k, resizedTileHeight
 
       if particleTiles
         # Draw Particles

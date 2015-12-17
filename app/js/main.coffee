@@ -1,13 +1,28 @@
 init = (TileField) ->
 # -- FPS --------------------------------
 #  input = new Input(document, CanvasControl)
-  #TODO: сделать дравинг в зависимости от размера экрана
+#  TODO: сделать дравинг в зависимости от размера экрана
   launch = ->
     new JsonLoader([
       gameScheme.map
-      gameScheme.imageFiles
     ]).then (jsonResponse) ->
-      new ImgLoader([{ graphics: jsonResponse[1].images }]).then (imgResponse) ->
+
+      images = [
+        {
+          graphics: [
+            "../samples/img/game/ground/0-grass.png",
+            "../samples/img/game/ground/1-path.png",
+            "../samples/img/game/ground/blank-block.png"
+          ]
+        },
+        {
+          graphics: [
+            "../samples/img/players/main.png"
+          ]
+        }
+      ];
+
+      new ImgLoader(images).then (imgResponse) ->
         #TODO: 20, 20 - эти цифры должны заменится размером раб. области (экран, тач)
         game = new main(0, 0, 40, 20)
 #         heightMap:
@@ -24,6 +39,10 @@ init = (TileField) ->
           layoutHeight: jsonResponse[0].length
           graphics: imgResponse[0].files
           graphicsDictionary: imgResponse[0].dictionary
+          heightMap: {
+            offset: 0,
+            heightTile: imgResponse[0].files["blank-block.png"],
+          },
           heightTile: 64
           tileHeight: gameScheme.tileHeight
           tileWidth: gameScheme.tileWidth
@@ -258,7 +277,6 @@ init = (TileField) ->
     tileHeight: 64
     tileWidth: 128
     map: 'json/mapHeight.json'
-    imageFiles: 'json/imageFiles.json'
 
   launch()
   return
