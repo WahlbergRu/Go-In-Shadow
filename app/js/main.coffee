@@ -41,7 +41,7 @@ init = (TileField) ->
           graphicsDictionary: imgResponse[0].dictionary
           heightMap: {
             offset: 0,
-            heightTile: imgResponse[0].files["blank-block.png"],
+            heightTile: imgResponse[0].files["blank-block.png"]
           },
           heightTile: 64
           tileHeight: gameScheme.tileHeight
@@ -50,7 +50,7 @@ init = (TileField) ->
           layoutLevel: 0
           applyInteractions: true
           shadow: {
-            offset: 128
+            offset: 64
             verticalColor: '(5, 5, 30, 0.4)'
             horizontalColor: '(6, 5, 50, 0.5)'
           }
@@ -273,10 +273,10 @@ init = (TileField) ->
   # Editor Globals ------------------------
   tileSelection = {}
   # ---------------------------------------
-  gameScheme = 
+  gameScheme =
     tileHeight: 64
     tileWidth: 128
-    map: 'json/mapHeight.json'
+    map: 'json/mapSmall.json'
 
   launch()
   return

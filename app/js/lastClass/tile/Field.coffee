@@ -70,7 +70,6 @@ class Field
       if settings.shadow
         _applyHeightShadow true, settings.shadow
       if settings.heightTile
-#        console.log(settings.heightTile);
         _stackTiles settings.heightTile
       if settings.particleEffects
         particleEffects = settings.particleEffects
@@ -113,7 +112,7 @@ class Field
           tileOffset = (tileHeight - resizedTileHeight+1) * curZoom
         else
           tileOffset = (resizedTileHeight - tileHeight+1) * curZoom
-        console.log(tileOffset)
+#        console.log(tileOffset)
         ctx.fillStyle = 'rgba' + graphicValue
         ctx.beginPath()
         ctx.moveTo xpos,                              ypos + (stack - 1) * tileOffset + tileHeight * curZoom / 2
@@ -266,12 +265,12 @@ class Field
         if !distanceLightingSettings or distanceLightingSettings and distanceLighting < distanceLightingSettings.darkness
           # Draw the tile image
           ctx.save()
+          # TODO: разобраться с alphaWhenFocusBehind
           #            if alphaWhenFocusBehind and alphaWhenFocusBehind.apply == true
           #              if i == focusTilePosX + 1 and j == focusTilePosY + 1 or i == focusTilePosX and j == focusTilePosY + 1 or i == focusTilePosX + 1 and j == focusTilePosY
           #                if alphaWhenFocusBehind.objectApplied and (alphaWhenFocusBehind.objectApplied == null or alphaWhenFocusBehind.objectApplied and resizedTileHeight * curZoom > alphaWhenFocusBehind.objectApplied.height * curZoom)
           #                  ctx.globalAlpha = 0.6
           #          stack = layoutHeight
-          # TODO: сделать отрисовку в зависимости от высоты
           # TODO: сделать отрисовку разных уровней
           # tileImages - тайлы из imageFiles
           # layoutLevel - подставить для смены уровня
@@ -281,11 +280,6 @@ class Field
             # tile has a graphic ID
             # img_elem,dx_or_sx,dy_or_sy,dw_or_sw,dh_or_sh,dx,dy,dw,dh
             if stackGraphic != undefined
-              if globalI<10
-                console.log(mapLayout);
-                console.log(stack);
-                console.log(graphicValue);
-                globalI++
               img_elem = stackGraphic
               sx = 0
               sy = 0
@@ -298,27 +292,40 @@ class Field
 
               n=layoutHeight-stack
               while (n>=0)
-#                if globalI<100
-#                  console.log(i, j , stack);
-
-                dy = ypos + ((n+stack+layoutLevel+1) * heightOffset - (resizedTileHeight - tileHeight)) * curZoom
+                dy = ypos + ((layoutHeight+layoutLevel+1) * heightOffset - (resizedTileHeight - tileHeight)) * curZoom
                 ctx.drawImage img_elem, sx, sy, sw, sh, dx, dy, dw, dh
                 n--
 
+              # Apply mouse over tile coloring
               if mouseUsed and applyInteractions
-
-#                if globalI<100
-#                  globalI++
                 if i == focusTilePosX and j == focusTilePosY
-                  console.log(stack);
-
-                  # Apply mouse over tile coloring
                   _drawHorizontalColorOverlay xpos, ypos, '(255, 255, 120, 0.4)', -stack+1, resizedTileHeight
 
 
           else if graphicValue != -1
+            if globalI<10
+              console.log(mapLayout);
+              console.log(stack);
+              console.log(graphicValue);
+              globalI++
             # tile is an RGBA value
-            _drawHorizontalColorOverlay xpos, ypos, graphicValue, k, resizedTileHeight
+            img_elem = stackGraphic
+            sx = 0
+            sy = 0
+            dx = xpos
+            dw = tileWidth * curZoom
+            dh = resizedTileHeight * curZoom
+            dy = ypos + ((stack+1) * heightOffset - (resizedTileHeight - tileHeight)) * curZoom
+
+
+            #TODO: построить отрисовку стенок с помощью теней
+            n=layoutHeight-stack
+#            while (n>=0)
+            _drawHorizontalColorOverlay dx, dy, graphicValue, layoutHeight+layoutLevel+1, resizedTileHeight
+            if mouseUsed and applyInteractions
+              if i == focusTilePosX and j == focusTilePosY
+                _drawHorizontalColorOverlay xpos, ypos, '(255, 255, 120, 0.4)', -stack+1, resizedTileHeight
+
 
 #        else
 #          if heightMapOnTop
@@ -340,7 +347,7 @@ class Field
 #                else if graphicValue != -1
 #                  _drawHorizontalColorOverlay xpos, ypos, graphicValue, stack, resizedTileHeight
 #          else
-          # If tile is to be repeated for heightmap
+#           If tile is to be repeated for heightmap
 #          k = 0
 #          while k <= stack
 #            if !distanceLightingSettings or distanceLightingSettings and distanceLighting < distanceLightingSettings.darkness
@@ -370,16 +377,15 @@ class Field
 #                  else
 #                    ctx.drawImage stackGraphic, 0, 0, stackGraphic.width, stackGraphic.height, xpos, ypos + k * (tileHeight - heightOffset - resizedTileHeight) * curZoom, tileWidth * curZoom, resizedTileHeight * curZoom
 #            k++
-          ctx.restore()
 
       if heightShadows
         nextStack = 0
         currStack = 0
         shadowXpos = 0
         shadowYpos = 0
-        if heightMap
-          nextStack = Math.round(Number(heightMap[i][j - 1]))
-          currStack = Math.round(Number(heightMap[i][j]))
+        if mapLayout
+          nextStack = Math.round(Number(mapLayout[layoutHeight+layoutLevel][i][j - 1]))
+          currStack = Math.round(Number(mapLayout[layoutHeight+layoutLevel][i][j - 1]))
           if currStack < nextStack
             shadowXpos = (i - j) * tileHeight * curZoom + drawX
             shadowYpos = (i + j) * tileWidth / 4 * curZoom + drawY
@@ -405,6 +411,7 @@ class Field
             # Apply distance shadows from light source
             if stackGraphic != undefined or zeroIsBlank and stackGraphic != 0
               _drawHorizontalColorOverlay xpos, ypos, '(' + distanceLightingSettings.color + ',' + distanceLighting + ')', k, resizedTileHeight
+      ctx.restore()
 
       if particleTiles
         # Draw Particles
@@ -458,7 +465,7 @@ class Field
 
     _getHeightMapTile = (posX, posY) ->
 
-      console.log(_getTile[posX][posY])
+#      console.log(_getTile[posX][posY])
 
     _setZoom = (dir) ->
       if Number(dir)
@@ -521,27 +528,25 @@ class Field
         y: positionY
       }
 
+
+
+    #принимает значения мышки
     _applyMouseFocus = (x, y) ->
-      # h - Высота тайла
       mouseUsed = true
       if !isometric
         focusTilePosY = Math.round((y - (tileWidth * curZoom / 2)) / (tileWidth * curZoom))
         focusTilePosX = Math.round((x - (tileHeight * curZoom / 2)) / (tileHeight * curZoom))
       else
-        #��� ������, ���� � �������
-
-#        console.log(tileHeight);
         focusTilePosY = (2 * (y - drawY) - x + drawX) / 2
         focusTilePosX = x + focusTilePosY - drawX - (tileHeight * curZoom)
-#        console.log(focusTilePosX,focusTilePosY);
         focusTilePosY = Math.round(focusTilePosY / (tileHeight * curZoom))
         focusTilePosX = Math.round(focusTilePosX / (tileHeight * curZoom))
-#        console.log(focusTilePosX,focusTilePosY);
       {
         x: focusTilePosX
         y: focusTilePosY
       }
 
+    #Повесить элемент
     _setTile = (x, y, val) ->
       if !mapLayout[layoutLevel][x]
         mapLayout[layoutLevel][x] = []
