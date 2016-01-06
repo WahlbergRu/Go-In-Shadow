@@ -96,6 +96,8 @@ class Field
     #Used for drawing horizontal shadows on top of tiles or RGBA tiles when color value is passed
     #Отрисовка на взаимодействие с мышкой
 
+    #TODO: дописать отрисовку при приближение и отдаление, либо убрать отдаление и приближение вообще
+
     _drawHorizontalColorOverlay = (xpos, ypos, graphicValue, stack, resizedTileHeight) ->
       if !isometric
         ctx.fillStyle = 'rgba' + graphicValue
@@ -109,10 +111,10 @@ class Field
         tileOffset = undefined
 
         if tileHeight < resizedTileHeight
-          tileOffset = (tileHeight - resizedTileHeight+1) * curZoom
+          tileOffset = (tileHeight - resizedTileHeight) * curZoom
         else
-          tileOffset = (resizedTileHeight - tileHeight+1) * curZoom
-#        console.log(tileOffset)
+          tileOffset = (resizedTileHeight - tileHeight) * curZoom
+
         ctx.fillStyle = 'rgba' + graphicValue
         ctx.beginPath()
         ctx.moveTo xpos,                              ypos + (stack - 1) * tileOffset + tileHeight * curZoom / 2
@@ -126,16 +128,37 @@ class Field
     # Used for drawing vertical shadows on top of tiles in isometric view if switched on
     # Используется для рисования вертикальных теней на элементе сетки в изометрическом вьюме, если вклчючена
 
-    _drawVeritcalColorOverlay = (shadowXpos, shadowYpos, graphicValue, currStack, nextStack, resizedTileHeight, shadowSettings) ->
-      shadowHeight = tileHeight - (shadowSettings.offset) or 1
+    _drawVeritcalColorOverlay = (shadowXpos, shadowYpos, graphicValue, currStack, resizedTileHeight, direction) ->
       ctx.fillStyle = 'rgba' + graphicValue
-      ctx.beginPath()
-      ctx.moveTo shadowXpos + tileHeight * curZoom, shadowYpos + (currStack - 1) * (tileHeight - resizedTileHeight) * curZoom
-      ctx.lineTo shadowXpos + tileHeight * curZoom, shadowYpos - ((nextStack - 1) * shadowHeight / (shadowHeight / shadowSettings.offset) * curZoom)
-      ctx.lineTo shadowXpos + tileHeight * curZoom * 2, shadowYpos - ((nextStack - 1) * shadowHeight / (shadowHeight / shadowSettings.offset) * curZoom) + tileHeight * curZoom / 2
-      ctx.lineTo shadowXpos + tileHeight * curZoom * 2, shadowYpos + (currStack - 1) * (tileHeight - resizedTileHeight) * curZoom + tileHeight * curZoom / 2
-      ctx.fill()
-      return
+      #      ctx.moveTo xpos, ypos
+      #      ctx.lineTo xpos + tileWidth * curZoom, ypos
+      #      ctx.lineTo xpos + tileWidth * curZoom, ypos + tileHeight * curZoom
+      #      ctx.lineTo xpos, ypos + tileHeight * curZoom
+      tileOffset = undefined
+
+      if tileHeight < resizedTileHeight
+        tileOffset = (tileHeight - resizedTileHeight) * curZoom
+      else
+        tileOffset = (resizedTileHeight - tileHeight) * curZoom
+
+      #Work tut
+
+      if direction == 'FromLeftToBottom'
+        ctx.beginPath()
+        ctx.moveTo shadowXpos,                                shadowYpos + (currStack - 1) * tileOffset + tileHeight * curZoom / 2
+        ctx.lineTo shadowXpos + tileHeight * curZoom,         shadowYpos + (currStack - 2) * tileOffset
+        ctx.lineTo shadowXpos + tileHeight * curZoom,         shadowYpos + (currStack - 2) * tileOffset + tileHeight * curZoom
+        ctx.lineTo shadowXpos,                                shadowYpos + (currStack - 2) * tileOffset + tileHeight * curZoom / 2
+        ctx.fill()
+        return
+      else if direction == 'FromBottomToRight'
+        ctx.beginPath()
+        ctx.moveTo shadowXpos + tileHeight * curZoom * 2,     shadowYpos + (currStack - 1) * tileOffset + tileHeight * curZoom / 2
+        ctx.lineTo shadowXpos + tileHeight * curZoom ,        shadowYpos + (currStack - 2) * tileOffset
+        ctx.lineTo shadowXpos + tileHeight * curZoom ,        shadowYpos + (currStack - 2) * tileOffset + tileHeight * curZoom
+        ctx.lineTo shadowXpos + tileHeight * curZoom * 2,     shadowYpos + (currStack - 2) * tileOffset + tileHeight * curZoom / 2
+        ctx.fill()
+        return
 
     # Used for drawing particle effects applied to tiles
 
@@ -178,17 +201,13 @@ class Field
       resizedTileHeight = undefined
       stackGraphic = null
 
+      #с высотой работать тут
       stack = 0
-
       while (layoutLevel+stack<layoutHeight)
         if mapLayout[layoutLevel+stack][i] and mapLayout[layoutLevel+stack][i][j] == 0
           stack++
         else
           break
-
-#      if (globalJ < 10)
-#        console.log(stack)
-#        globalJ++
 
       if mapLayout[layoutLevel+stack][i]
         graphicValue = mapLayout[layoutLevel+stack][i][j]
@@ -197,10 +216,6 @@ class Field
       distanceLightingSettings = undefined
       k = 0
 
-      #с высотой работать тут
-
-#      if heightMap
-#        stack = Math.round(Number(heightMap[i][j]))
 
       if shadowDistance
         distanceLightingSettings =
@@ -303,29 +318,25 @@ class Field
 
 
           else if graphicValue != -1
-            if globalI<10
-              console.log(mapLayout);
-              console.log(stack);
-              console.log(graphicValue);
-              globalI++
+
             # tile is an RGBA value
             img_elem = stackGraphic
-            sx = 0
-            sy = 0
             dx = xpos
-            dw = tileWidth * curZoom
-            dh = resizedTileHeight * curZoom
             dy = ypos + ((stack+1) * heightOffset - (resizedTileHeight - tileHeight)) * curZoom
 
+            n=layoutHeight-stack
 
             #TODO: построить отрисовку стенок с помощью теней
-            n=layoutHeight-stack
-#            while (n>=0)
-            _drawHorizontalColorOverlay dx, dy, graphicValue, layoutHeight+layoutLevel+1, resizedTileHeight
+            _drawHorizontalColorOverlay dx, dy, graphicValue, layoutHeight+layoutLevel, resizedTileHeight
+
             if mouseUsed and applyInteractions
               if i == focusTilePosX and j == focusTilePosY
-                _drawHorizontalColorOverlay xpos, ypos, '(255, 255, 120, 0.4)', -stack+1, resizedTileHeight
+                _drawHorizontalColorOverlay dx, dy, '(255, 255, 120, 0.4)', layoutHeight+layoutLevel, resizedTileHeight
 
+            while (n>=0)
+              _drawVeritcalColorOverlay dx, dy, '(50, 50, 150, 1)', n+stack+layoutLevel, resizedTileHeight, 'FromLeftToBottom'
+              _drawVeritcalColorOverlay dx, dy, '(50, 50, 100, 1)', n+stack+layoutLevel, resizedTileHeight, 'FromBottomToRight'
+              n--
 
 #        else
 #          if heightMapOnTop

@@ -50,7 +50,7 @@ init = (TileField) ->
           layoutLevel: 0
           applyInteractions: true
           shadow: {
-            offset: 64
+            offset: 0
             verticalColor: '(5, 5, 30, 0.4)'
             horizontalColor: '(6, 5, 50, 0.5)'
           }
